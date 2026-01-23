@@ -1,0 +1,6 @@
+@CourtCMS.Api_HostAddress = http://localhost:5196
+
+GET {{CourtCMS.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

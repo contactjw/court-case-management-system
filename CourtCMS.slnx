@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CourtCMS.Api/CourtCMS.Api.csproj" />
+  <Project Path="CourtCMS.Application/CourtCMS.Application.csproj" />
+  <Project Path="CourtCMS.Domain/CourtCMS.Domain.csproj" />
+  <Project Path="CourtCMS.Infrastructure/CourtCMS.Infrastructure.csproj" />
+</Solution>
