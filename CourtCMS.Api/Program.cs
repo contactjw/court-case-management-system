@@ -1,9 +1,18 @@
+using CourtCMS.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Get the connection string from Secrets (or appsettings.json)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Register the DbContext
+builder.Services.AddDbContext<CourtDbContext>(options =>
+    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("CourtCMS.Infrastructure")));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
