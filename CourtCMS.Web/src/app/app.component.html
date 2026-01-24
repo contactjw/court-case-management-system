@@ -1,0 +1,19 @@
+<div class="container">
+  <h1>Orange County Superior Court</h1>
+  <h2>Case Management Dashboard</h2>
+
+  <div class="card-grid">
+    @for (courtCase of cases; track courtCase.id) {
+      <div class="case-card">
+        <h3>{{ courtCase.caseNumber }}</h3>
+        <p><strong>Title:</strong> {{ courtCase.title }}</p>
+        <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
+        <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
+          {{ courtCase.status }}
+        </span>
+      </div>
+    } @empty {
+      <p>No cases found. Is the backend running?</p>
+    }
+  </div>
+</div>

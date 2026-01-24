@@ -71,5 +71,44 @@ namespace CourtCMS.Api.Controllers
 
             return Ok(dto);
         }
+
+        // POST: api/cases
+        [HttpPost]
+        public async Task<ActionResult<CaseDto>> CreateCase(CreateCaseDto createDto)
+        {
+            // 1. Convert DTO to Domain Entity
+            var newCase = new CourtCase
+            {
+                CaseNumber = createDto.CaseNumber,
+                Title = createDto.Title,
+                Status = "Open", // Default business rule
+                FilingDate = DateTime.UtcNow,
+                AssignedJudgeId = createDto.AssignedJudgeId
+            };
+
+            // 2. Add to Database (The Kitchen)
+            _context.CourtCases.Add(newCase);
+            await _context.SaveChangesAsync();
+
+            // 3. Return the Result
+            // We need to reload the Judge object to return the full name to the user immediately
+            // (EF Core doesn't load relationships automatically after adding)
+            await _context.Entry(newCase).Reference(c => c.AssignedJudge).LoadAsync();
+
+            var resultDto = new CaseDto
+            {
+                Id = newCase.Id,
+                CaseNumber = newCase.CaseNumber,
+                Title = newCase.Title,
+                Status = newCase.Status,
+                FilingDate = newCase.FilingDate,
+                AssignedJudgeName = newCase.AssignedJudge != null 
+                    ? $"{newCase.AssignedJudge.FirstName} {newCase.AssignedJudge.LastName}" 
+                    : "Unassigned"
+            };
+
+            // Return 201 Created
+            return CreatedAtAction(nameof(GetCase), new { id = newCase.Id }, resultDto);
+        }
     }
 }
