@@ -6,3 +6,9 @@ export interface Case {
   filingDate: string;
   assignedJudgeName: string;
 }
+
+export interface CreateCaseRequest {
+  caseNumber: string;
+  title: string;
+  assignedJudgeId: number;
+}
