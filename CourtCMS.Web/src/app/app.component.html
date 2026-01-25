@@ -47,6 +47,9 @@
         <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
           {{ courtCase.status }}
         </span>
+        @if (courtCase.status !== 'Closed') {
+          <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
+        }
       </div>
     } @empty {
       <p>No cases found. Is the backend running?</p>

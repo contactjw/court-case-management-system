@@ -61,4 +61,24 @@ export class AppComponent implements OnInit {
       },
     });
   }
+
+  // This function runs when the user clicks "Close Case"
+  closeCase(courtCase: Case): void {
+    // 1. Prepare the updated data
+    const updateData = {
+      title: courtCase.title, // Keep title same
+      assignedJudgeId: 1, // Keep judge (simplified for now)
+      status: 'Closed', // CHANGE THIS
+    };
+
+    // 2. Call the API
+    this.caseService.updateCase(courtCase.id, updateData).subscribe({
+      next: () => {
+        // 3. Update the screen instantly
+        courtCase.status = 'Closed';
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error closing case:', err),
+    });
+  }
 }

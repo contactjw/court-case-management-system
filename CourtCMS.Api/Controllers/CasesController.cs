@@ -110,5 +110,48 @@ namespace CourtCMS.Api.Controllers
             // Return 201 Created
             return CreatedAtAction(nameof(GetCase), new { id = newCase.Id }, resultDto);
         }
+
+        // PUT: api/cases/5
+        // This endpoint updates an existing case
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCase(int id, UpdateCaseDto updateDto)
+        {
+            // 1. Find the case in the database
+            var existingCase = await _context.CourtCases.FindAsync(id);
+
+            // 2. Safety Check: Does it exist?
+            if (existingCase == null)
+            {
+                return NotFound();
+            }
+
+            // 3. Update the fields
+            existingCase.Title = updateDto.Title;
+            existingCase.Status = updateDto.Status;
+            existingCase.AssignedJudgeId = updateDto.AssignedJudgeId;
+
+            // 4. Save changes to SQL
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // This handles rare errors if two people update at the exact same time
+                if (!_context.CourtCases.Any(c => c.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            // 5. Return "No Content" (Standard for updates)
+            // It means "Done, nothing new to show you."
+            return NoContent();
+        }
+
     }
 }

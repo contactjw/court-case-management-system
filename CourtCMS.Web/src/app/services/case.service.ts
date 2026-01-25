@@ -19,4 +19,9 @@ export class CaseService {
   createCase(newCase: CreateCaseRequest): Observable<Case> {
     return this.http.post<Case>(this.apiUrl, newCase);
   }
+
+  updateCase(id: number, caseData: any): Observable<any> {
+    const url = `${this.apiUrl}/${id}`; // creates '/api/cases/1'
+    return this.http.put(url, caseData);
+  }
 }

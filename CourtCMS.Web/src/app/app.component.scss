@@ -97,3 +97,14 @@ button {
     background-color: darken($court-blue, 10%);
   }
 }
+
+.btn-close {
+  background-color: #dc3545; // Red
+  margin-left: 1rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+
+  &:hover {
+    background-color: #c82333;
+  }
+}
