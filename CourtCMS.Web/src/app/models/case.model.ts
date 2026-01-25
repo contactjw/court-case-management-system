@@ -5,6 +5,10 @@ export interface Case {
   status: string;
   filingDate: string;
   assignedJudgeName: string;
+
+  assignedJudgeId?: number;
+
+  isEditing?: boolean;
 }
 
 export interface CreateCaseRequest {

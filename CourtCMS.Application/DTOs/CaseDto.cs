@@ -10,5 +10,7 @@ namespace CourtCMS.Application.DTOs
         public string Status { get; set; } = string.Empty;
         public DateTime FilingDate { get; set; }
         public string AssignedJudgeName { get; set; } = string.Empty;
+
+        public int? AssignedJudgeId { get; set; }
     }
 }

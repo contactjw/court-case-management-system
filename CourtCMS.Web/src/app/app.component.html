@@ -42,13 +42,59 @@
     @for (courtCase of cases; track courtCase.id) {
       <div class="case-card">
         <h3>{{ courtCase.caseNumber }}</h3>
-        <p><strong>Title:</strong> {{ courtCase.title }}</p>
-        <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
-        <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
-          {{ courtCase.status }}
-        </span>
-        @if (courtCase.status !== 'Closed') {
-          <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
+
+        @if (!courtCase.isEditing) {
+          <p><strong>Title:</strong> {{ courtCase.title }}</p>
+          <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
+
+          <div class="button-row">
+            <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
+              {{ courtCase.status }}
+            </span>
+
+            <button class="btn-edit" (click)="enableEdit(courtCase)">Edit</button>
+
+            @if (courtCase.status !== 'Closed') {
+              <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
+            }
+          </div>
+        }
+
+        @if (courtCase.isEditing) {
+          <div class="edit-form">
+            <div class="form-group-sm">
+              <label>Case #:</label>
+              <input type="text" [(ngModel)]="courtCase.caseNumber" />
+            </div>
+
+            <div class="form-group-sm">
+              <label>Title:</label>
+              <input type="text" [(ngModel)]="courtCase.title" />
+            </div>
+
+            <div class="form-group-sm">
+              <label>Judge:</label>
+              <select [(ngModel)]="courtCase.assignedJudgeId">
+                @for (judge of judges; track judge.id) {
+                  <option [ngValue]="judge.id">{{ judge.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group-sm">
+              <label>Status:</label>
+              <select [(ngModel)]="courtCase.status">
+                @for (stat of statuses; track stat) {
+                  <option [value]="stat">{{ stat }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="edit-actions">
+              <button class="btn-save" (click)="saveCase(courtCase)">Save</button>
+              <button class="btn-cancel" (click)="cancelEdit(courtCase)">Cancel</button>
+            </div>
+          </div>
         }
       </div>
     } @empty {

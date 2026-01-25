@@ -22,6 +22,14 @@ export class AppComponent implements OnInit {
     assignedJudgeId: 1,
   };
 
+  judges = [
+    { id: 1, name: 'Judy Scheindlin' },
+    { id: 2, name: 'Joseph Wapner' },
+    { id: 3, name: 'Marilyn Milian' },
+  ];
+
+  statuses = ['Open', 'Closed', 'Suspended'];
+
   // We inject the Service (to talk to API) and the ChangeDetector (to refresh screen)
   constructor(
     private caseService: CaseService,
@@ -66,9 +74,10 @@ export class AppComponent implements OnInit {
   closeCase(courtCase: Case): void {
     // 1. Prepare the updated data
     const updateData = {
-      title: courtCase.title, // Keep title same
-      assignedJudgeId: 1, // Keep judge (simplified for now)
-      status: 'Closed', // CHANGE THIS
+      caseNumber: courtCase.caseNumber,
+      title: courtCase.title,
+      assignedJudgeId: courtCase.assignedJudgeId,
+      status: 'Closed',
     };
 
     // 2. Call the API
@@ -79,6 +88,46 @@ export class AppComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error closing case:', err),
+    });
+  }
+
+  // 1. Turn on Edit Mode
+  enableEdit(courtCase: Case): void {
+    courtCase.isEditing = true;
+  }
+
+  // 2. Turn off Edit Mode (Revert changes if needed - simplified here)
+  cancelEdit(courtCase: Case): void {
+    courtCase.isEditing = false;
+  }
+
+  // 3. Save Changes
+  saveCase(courtCase: Case): void {
+    // We need to map the data to match what the API expects
+    // Note: For now, we will hardcode Judge ID 1 just to make the Title update work easily.
+    // In a real app, we would need a dropdown menu here.
+    const updateData = {
+      caseNumber: courtCase.caseNumber,
+      title: courtCase.title,
+      status: courtCase.status,
+      assignedJudgeId: courtCase.assignedJudgeId,
+    };
+
+    this.caseService.updateCase(courtCase.id, updateData).subscribe({
+      next: () => {
+        const selectedJudge = this.judges.find((j) => j.id == courtCase.assignedJudgeId);
+        if (selectedJudge) {
+          courtCase.assignedJudgeName = selectedJudge.name;
+        }
+
+        console.log('Case updated successfully');
+        courtCase.isEditing = false; // Turn off edit mode
+        this.cdr.detectChanges(); // Refresh screen
+      },
+      error: (err) => {
+        console.error('Update failed', err);
+        alert('Failed to update case');
+      },
     });
   }
 }

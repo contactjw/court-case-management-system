@@ -38,7 +38,9 @@ namespace CourtCMS.Api.Controllers
                 // Handle null judge safely
                 AssignedJudgeName = c.AssignedJudge != null 
                     ? $"{c.AssignedJudge.FirstName} {c.AssignedJudge.LastName}" 
-                    : "Unassigned"
+                    : "Unassigned",
+
+                AssignedJudgeId = c.AssignedJudgeId
             }).ToList();
 
             return Ok(caseDtos);
@@ -66,7 +68,8 @@ namespace CourtCMS.Api.Controllers
                 FilingDate = courtCase.FilingDate,
                 AssignedJudgeName = courtCase.AssignedJudge != null 
                     ? $"{courtCase.AssignedJudge.FirstName} {courtCase.AssignedJudge.LastName}" 
-                    : "Unassigned"
+                    : "Unassigned",
+                AssignedJudgeId = courtCase.AssignedJudgeId
             };
 
             return Ok(dto);
@@ -104,7 +107,7 @@ namespace CourtCMS.Api.Controllers
                 FilingDate = newCase.FilingDate,
                 AssignedJudgeName = newCase.AssignedJudge != null 
                     ? $"{newCase.AssignedJudge.FirstName} {newCase.AssignedJudge.LastName}" 
-                    : "Unassigned"
+                    : "Unassigned",
             };
 
             // Return 201 Created
@@ -126,6 +129,7 @@ namespace CourtCMS.Api.Controllers
             }
 
             // 3. Update the fields
+            existingCase.CaseNumber = updateDto.CaseNumber;
             existingCase.Title = updateDto.Title;
             existingCase.Status = updateDto.Status;
             existingCase.AssignedJudgeId = updateDto.AssignedJudgeId;
