@@ -29,9 +29,12 @@
       </div>
 
       <div class="form-group">
-        <label>Judge ID:</label>
-        <input type="number" [(ngModel)]="newCaseModel.assignedJudgeId" name="judgeId" required />
-        <small>(1=Judy, 2=Wapner, 3=Marilyn)</small>
+        <label>Judge:</label>
+        <select [(ngModel)]="newCaseModel.assignedJudgeId" name="judgeId" required>
+          @for (judge of judges; track judge.id) {
+            <option [ngValue]="judge.id">{{ judge.name }}</option>
+          }
+        </select>
       </div>
 
       <button type="submit">File Case</button>
