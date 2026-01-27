@@ -65,6 +65,21 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# .NET Build Folders
+bin/
+obj/
+.vs/
+*.user
+
+# Angular/Node Build Folders
+node_modules/
+dist/
+.angular/
+
+# Mac/Windows Junk
+.DS_Store
+Thumbs.db
+
 # Tye
 .tye/
 
