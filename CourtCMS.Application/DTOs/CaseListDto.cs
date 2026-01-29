@@ -1,20 +1,17 @@
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace CourtCMS.Application.DTOs
 {
-    public class UpdateCaseDto
+    public class CaseListDto
     {
-        // Send to frontend so it knows which case to update
+        // Keep the Id so that frontend can link to case details
         public int Id { get; set; }
-        
         public string CaseNumber { get; set; } = string.Empty;
-
-        [Required]
         public string Title { get; set; } = string.Empty;
-
-        [Required]
         public string Status { get; set; } = string.Empty;
 
-        public int? AssignedJudgeId { get; set; }
+        // Flatten JudgeName for easier display
+        public string AssignedJudgeName { get; set; } = string.Empty;
+
     }
 }
