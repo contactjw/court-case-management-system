@@ -20,30 +20,25 @@ namespace CourtCMS.Api.Controllers
 
         // GET: api/cases
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CaseDto>>> GetCases()
+        public async Task<ActionResult<IEnumerable<CaseListDto>>> GetCases()
         {
-            // 1. Get entities from DB including the related Judge
-            var cases = await _context.CourtCases
-                .Include(c => c.AssignedJudge) // This is an EAGER LOAD (SQL JOIN)
-                .ToListAsync();
+            var caseList = await _context.CourtCases
+                .OrderByDescending(c => c.CreatedDate)
+                .Select(c => new CaseListDto
+                {
+                    Id = c.Id,
+                    CaseNumber = c.CaseNumber,
+                    Title = c.Title,
+                    Status = c.Status,
+                    FilingDate = c.FilingDate,
+                    AssignedJudgeName = c.AssignedJudge != null
+                        ? $"{c.AssignedJudge.FirstName} {c.AssignedJudge.LastName}"
+                        : "Unassigned",
+                    AssignedJudgeId = c.AssignedJudgeId
 
-            // 2. Map Entity -> DTO manually (Professional projects use AutoMapper, but manual is clearer for learning)
-            var caseDtos = cases.Select(c => new CaseDto
-            {
-                Id = c.Id,
-                CaseNumber = c.CaseNumber,
-                Title = c.Title,
-                Status = c.Status,
-                FilingDate = c.FilingDate,
-                // Handle null judge safely
-                AssignedJudgeName = c.AssignedJudge != null 
-                    ? $"{c.AssignedJudge.FirstName} {c.AssignedJudge.LastName}" 
-                    : "Unassigned",
+                }).ToListAsync();
 
-                AssignedJudgeId = c.AssignedJudgeId
-            }).ToList();
-
-            return Ok(caseDtos);
+            return Ok(caseList);
         }
 
         // GET: api/cases/5

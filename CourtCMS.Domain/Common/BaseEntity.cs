@@ -11,9 +11,9 @@ namespace CourtCMS.Domain.Common
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         // We use a string for the ID because ASP.NET Identity
-        public string CreatedByUserId { get; set; } = string.Empty;
-        
+        // public string CreatedByUserId { get; set; } = string.Empty;
+
         public DateTime? LastModifiedDate { get; set; }
-        public string? LastModifiedByUserId { get; set; }
+        // public string? LastModifiedByUserId { get; set; }
     }
 }
