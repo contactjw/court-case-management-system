@@ -47,6 +47,7 @@ namespace CourtCMS.Api.Controllers
         {
             var courtCase = await _context.CourtCases
                 .Include(c => c.AssignedJudge)
+                .Include(c => c.Hearings)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (courtCase == null)
@@ -54,7 +55,7 @@ namespace CourtCMS.Api.Controllers
                 return NotFound(); // Returns 404
             }
 
-            var dto = new CaseDto
+            var caseDto = new CaseDto
             {
                 Id = courtCase.Id,
                 CaseNumber = courtCase.CaseNumber,
@@ -67,7 +68,7 @@ namespace CourtCMS.Api.Controllers
                 AssignedJudgeId = courtCase.AssignedJudgeId
             };
 
-            return Ok(dto);
+            return Ok(caseDto);
         }
 
         // POST: api/cases
