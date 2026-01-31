@@ -76,7 +76,9 @@ export class AppComponent implements OnInit {
         console.log('Case created successfully:', createdCase);
 
         // Add the new case to the list
-        this.cases.push(createdCase);
+        // this.cases.push(createdCase);
+
+        this.cases.unshift(createdCase);
 
         // Clear the form
         this.newCaseModel = { caseNumber: '', title: '', assignedJudgeId: null };

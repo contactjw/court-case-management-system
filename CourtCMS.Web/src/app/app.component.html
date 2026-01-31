@@ -51,6 +51,7 @@
         @if (!courtCase.isEditing) {
           <p><strong>Title:</strong> {{ courtCase.title }}</p>
           <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
+          <p><strong>Filing Date:</strong> {{ courtCase.filingDate | date: 'mediumDate' }}</p>
 
           <div class="button-row">
             <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
