@@ -30,6 +30,9 @@ namespace CourtCMS.Infrastructure.Data
                 .HasOne(cp => cp.Party)
                 .WithMany(p => p.CaseParties)
                 .HasForeignKey(cp => cp.PartyId);
+
+            modelBuilder.Entity<CourtCase>().HasQueryFilter(c => !c.IsDeleted);
+            modelBuilder.Entity<Judge>().HasQueryFilter(j => !j.IsDeleted);
         }
     }
 }

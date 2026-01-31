@@ -62,6 +62,8 @@
             @if (courtCase.status !== 'Closed') {
               <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
             }
+
+            <button class="btn-delete" (click)="deleteCase(courtCase)">Delete</button>
           </div>
         }
 

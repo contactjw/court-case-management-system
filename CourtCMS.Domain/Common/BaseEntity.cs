@@ -15,5 +15,8 @@ namespace CourtCMS.Domain.Common
 
         public DateTime? LastModifiedDate { get; set; }
         // public string? LastModifiedByUserId { get; set; }
+
+        // If true, the app should ignore this record (unless we are an Admin auditing data)
+        public bool IsDeleted { get; set; } = false;
     }
 }

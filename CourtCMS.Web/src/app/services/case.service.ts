@@ -30,4 +30,9 @@ export class CaseService {
     const url = `${this.apiUrl}/${id}`; // creates '/api/cases/1'
     return this.http.put(url, caseData);
   }
+
+  // DELETE: Trigger the soft delete on the backend
+  deleteCase(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

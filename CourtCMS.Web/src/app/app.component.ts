@@ -111,6 +111,34 @@ export class AppComponent implements OnInit {
     });
   }
 
+  deleteCase(courtCase: Case): void {
+    // 1. The Safety Check (Popup)
+    const isConfirmed = confirm(
+      `Are you sure you want to delete Case ${courtCase.caseNumber}?\n\nThis action cannot be undone.`,
+    );
+
+    // 2. If they clicked "Cancel", stop immediately.
+    if (!isConfirmed) {
+      return;
+    }
+
+    // 3. If "OK", call the API
+    this.caseService.deleteCase(courtCase.id).subscribe({
+      next: () => {
+        // 4. Update the UI instantly (Remove it from the array)
+        // We filter the list to keep everything EXCEPT the one we just deleted
+        this.cases = this.cases.filter((c) => c.id !== courtCase.id);
+
+        console.log('Case deleted (soft delete)');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error deleting case:', err);
+        alert('Could not delete case. Check console for details.');
+      },
+    });
+  }
+
   // 1. Turn on Edit Mode
   enableEdit(courtCase: Case): void {
     courtCase.isEditing = true;

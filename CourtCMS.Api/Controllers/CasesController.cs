@@ -154,5 +154,21 @@ namespace CourtCMS.Api.Controllers
             return NoContent();
         }
 
+        // DELETE: api/cases/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCase(int id)
+        {
+            var courtCase = await _context.CourtCases.FindAsync(id);
+            if (courtCase == null) return NotFound();
+
+            // Soft delete
+            courtCase.IsDeleted = true;
+            courtCase.LastModifiedDate = DateTime.UtcNow; // Audit the change!
+            
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }
