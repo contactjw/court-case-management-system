@@ -131,7 +131,20 @@ namespace CourtCMS.Api.Controllers
             existingCase.Status = updateDto.Status;
             existingCase.AssignedJudgeId = updateDto.AssignedJudgeId;
 
-            // 4. Save changes to SQL
+            // Check if anything changed on the Change Tracker
+            var isModified = _context.Entry(existingCase).State == EntityState.Modified;
+
+            if (!isModified)
+            {
+                // If nothing changed, we don't touch the Date, and we don't talk to the Database.
+                return NoContent();
+            }
+
+            // 4. Only if we are here, something truly changed. Update the Audit Log.
+            existingCase.LastModifiedDate = DateTime.UtcNow;
+
+
+            // 5. Save changes to SQL
             try
             {
                 await _context.SaveChangesAsync();
@@ -149,7 +162,7 @@ namespace CourtCMS.Api.Controllers
                 }
             }
 
-            // 5. Return "No Content" (Standard for updates)
+            // 6. Return "No Content" (Standard for updates)
             // It means "Done, nothing new to show you."
             return NoContent();
         }
