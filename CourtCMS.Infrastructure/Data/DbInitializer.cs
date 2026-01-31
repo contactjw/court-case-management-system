@@ -16,9 +16,10 @@ namespace CourtCMS.Infrastructure.Data
 
             var judges = new Judge[]
             {
-                new Judge { FirstName = "Judy", LastName = "Scheindlin", CourtRoom = "Room 101", IsActive = true },
-                new Judge { FirstName = "Joseph", LastName = "Wapner", CourtRoom = "Room 102", IsActive = false },
-                new Judge { FirstName = "Marilyn", LastName = "Milian", CourtRoom = "Room 205", IsActive = true }
+                new Judge { FirstName = "Judy", LastName = "Scheindlin", CourtRoom = "Room 101", IsActive = true, CreatedDate = DateTime.UtcNow.AddDays(-1) },
+                new Judge { FirstName = "Joseph", LastName = "Wapner", CourtRoom = "Room 202", IsActive = true, CreatedDate = DateTime.UtcNow.AddDays(-10) },
+                new Judge { FirstName = "Marilyn", LastName = "Milian", CourtRoom = "Room 303", IsActive = true, CreatedDate = DateTime.UtcNow.AddDays(-20)},
+                new Judge { FirstName = "Frank", LastName = "Caprio", CourtRoom = "Room 404", IsActive = true, CreatedDate = DateTime.UtcNow.AddDays(-30) },
             };
 
             context.Judges.AddRange(judges);

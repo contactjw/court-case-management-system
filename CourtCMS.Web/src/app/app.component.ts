@@ -19,14 +19,16 @@ export class AppComponent implements OnInit {
   newCaseModel: CreateCaseRequest = {
     caseNumber: '',
     title: '',
-    assignedJudgeId: 1,
+    assignedJudgeId: null,
   };
 
-  judges = [
-    { id: 1, name: 'Judy Scheindlin' },
-    { id: 2, name: 'Joseph Wapner' },
-    { id: 3, name: 'Marilyn Milian' },
-  ];
+  // judges = [
+  //   { id: 1, name: 'Judy Scheindlin' },
+  //   { id: 2, name: 'Joseph Wapner' },
+  //   { id: 3, name: 'Marilyn Milian' },
+  // ];
+
+  judges: any[] = [];
 
   statuses = ['Open', 'Closed', 'Suspended'];
 
@@ -36,20 +38,38 @@ export class AppComponent implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
-  // 1. Load data when the app starts
+  // Load data when the app starts for the cases list
   ngOnInit(): void {
+    this.loadData();
+  }
+
+  // Load data from the Database
+  loadData(): void {
+    // 1. Fetch cases from /api/cases
     this.caseService.getCases().subscribe({
       next: (data) => {
         this.cases = data;
-        this.cdr.detectChanges(); // <--- Force refresh after loading
+        // Required for force refresh after loading
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching cases:', err);
       },
     });
+
+    // Fetch Judges from Database
+    this.caseService.getJudges().subscribe({
+      next: (data) => {
+        this.judges = data;
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error fetching judges:', err),
+    });
   }
 
-  // 2. Create a new case when the button is clicked
+  // --- Actions ---
+
   createCase(): void {
     this.caseService.createCase(this.newCaseModel).subscribe({
       next: (createdCase) => {
@@ -59,7 +79,7 @@ export class AppComponent implements OnInit {
         this.cases.push(createdCase);
 
         // Clear the form
-        this.newCaseModel = { caseNumber: '', title: '', assignedJudgeId: 1 };
+        this.newCaseModel = { caseNumber: '', title: '', assignedJudgeId: null };
 
         // Tell Angular to repaint the screen immediately
         this.cdr.detectChanges();
@@ -117,7 +137,7 @@ export class AppComponent implements OnInit {
       next: () => {
         const selectedJudge = this.judges.find((j) => j.id == courtCase.assignedJudgeId);
         if (selectedJudge) {
-          courtCase.assignedJudgeName = selectedJudge.name;
+          courtCase.assignedJudgeName = selectedJudge.fullName;
         }
 
         console.log('Case updated successfully');

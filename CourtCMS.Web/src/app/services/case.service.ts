@@ -12,8 +12,14 @@ export class CaseService {
 
   constructor(private http: HttpClient) {}
 
+  // Fetch list of cases for viewing (lightweight)
   getCases(): Observable<Case[]> {
     return this.http.get<Case[]>(this.apiUrl);
+  }
+
+  // Fetch list of active judges
+  getJudges(): Observable<any[]> {
+    return this.http.get<any[]>('/api/judges');
   }
 
   createCase(newCase: CreateCaseRequest): Observable<Case> {

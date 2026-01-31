@@ -104,6 +104,7 @@ namespace CourtCMS.Api.Controllers
                 AssignedJudgeName = newCase.AssignedJudge != null 
                     ? $"{newCase.AssignedJudge.FirstName} {newCase.AssignedJudge.LastName}" 
                     : "Unassigned",
+                AssignedJudgeId = newCase.AssignedJudgeId
             };
 
             // Return 201 Created

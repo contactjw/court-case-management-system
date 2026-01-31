@@ -14,5 +14,5 @@ export interface Case {
 export interface CreateCaseRequest {
   caseNumber: string;
   title: string;
-  assignedJudgeId: number;
+  assignedJudgeId: number | null;
 }

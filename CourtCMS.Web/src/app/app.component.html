@@ -31,8 +31,10 @@
       <div class="form-group">
         <label>Judge:</label>
         <select [(ngModel)]="newCaseModel.assignedJudgeId" name="judgeId" required>
+          <option [ngValue]="null" disabled>-- Select a Judge --</option>
+
           @for (judge of judges; track judge.id) {
-            <option [ngValue]="judge.id">{{ judge.name }}</option>
+            <option [ngValue]="judge.id">{{ judge.fullName }}</option>
           }
         </select>
       </div>
@@ -79,7 +81,7 @@
               <label>Judge:</label>
               <select [(ngModel)]="courtCase.assignedJudgeId">
                 @for (judge of judges; track judge.id) {
-                  <option [ngValue]="judge.id">{{ judge.name }}</option>
+                  <option [ngValue]="judge.id">{{ judge.fullName }}</option>
                 }
               </select>
             </div>
