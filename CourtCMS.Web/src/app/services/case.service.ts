@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Case, CreateCaseRequest } from '../models/case.model';
+import { Case, CreateCaseRequest, CaseDetail } from '../models/case.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +15,10 @@ export class CaseService {
   // Fetch list of cases for viewing (lightweight)
   getCases(): Observable<Case[]> {
     return this.http.get<Case[]>(this.apiUrl);
+  }
+
+  getCaseById(id: number): Observable<CaseDetail> {
+    return this.http.get<CaseDetail>(`${this.apiUrl}/${id}`);
   }
 
   // Fetch list of active judges

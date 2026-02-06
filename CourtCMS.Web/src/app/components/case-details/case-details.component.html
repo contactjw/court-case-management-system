@@ -1,0 +1,96 @@
+<div class="case-details-container">
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading">
+      <p>Loading case details...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @else if (errorMessage) {
+    <div class="error-message">
+      <p>{{ errorMessage }}</p>
+      <button routerLink="/" class="btn-back">← Back to Case List</button>
+    </div>
+  }
+
+  <!-- Success: Display Case Details -->
+  @else if (caseData) {
+    <div class="details-header">
+      <h1>{{ caseData.caseNumber }}</h1>
+      <span class="status-badge" [class.closed]="caseData.status === 'Closed'">
+        {{ caseData.status }}
+      </span>
+    </div>
+
+    <h2>{{ caseData.title }}</h2>
+
+    <!-- Case Information Grid -->
+    <div class="info-grid">
+      <div class="info-item">
+        <strong>Filed:</strong>
+        {{ caseData.filingDate | date: 'mediumDate' }}
+      </div>
+      <div class="info-item">
+        <strong>Assigned Judge:</strong>
+        {{ caseData.assignedJudgeName }}
+      </div>
+      <div class="info-item">
+        <strong>Created:</strong>
+        {{ caseData.createdDate | date: 'short' }}
+      </div>
+      @if (caseData.lastModifiedDate) {
+        <div class="info-item">
+          <strong>Last Modified:</strong>
+          {{ caseData.lastModifiedDate | date: 'short' }}
+        </div>
+      }
+    </div>
+
+    <!-- Parties Section -->
+    <section class="section">
+      <h3>Parties Involved</h3>
+      @if (caseData.parties.length > 0) {
+        <ul class="parties-list">
+          @for (party of caseData.parties; track party.partyId) {
+            <li>
+              <strong>{{ party.fullName }}</strong>
+              <span class="role-badge">{{ party.role }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty-message">No parties assigned to this case.</p>
+      }
+    </section>
+
+    <!-- Hearings Section -->
+    <section class="section">
+      <h3>Scheduled Hearings</h3>
+      @if (caseData.hearings.length > 0) {
+        <div class="hearings-grid">
+          @for (hearing of caseData.hearings; track hearing.id) {
+            <div class="hearing-card">
+              <h4>{{ hearing.description }}</h4>
+              <p>
+                <strong>Date:</strong>
+                {{ hearing.hearingDate | date: 'full' }}
+              </p>
+              <p>
+                <strong>Location:</strong>
+                {{ hearing.location }}
+              </p>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty-message">No hearings scheduled.</p>
+      }
+    </section>
+
+    <!-- Back Button -->
+    <div class="actions">
+      <button routerLink="/" class="btn-back">← Back to Case List</button>
+    </div>
+  }
+</div>
