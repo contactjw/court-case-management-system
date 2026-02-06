@@ -41,35 +41,55 @@ namespace CourtCMS.Api.Controllers
             return Ok(caseList);
         }
 
-        // GET: api/cases/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<CaseDto>> GetCase(int id)
+    // GET: api/cases/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<CaseDetailDto>> GetCase(int id)
+    {
+        var courtCase = await _context.CourtCases
+            .Include(c => c.AssignedJudge)
+            .Include(c => c.Hearings)
+            .Include(c => c.CaseParties)
+                .ThenInclude(cp => cp.Party)  // Load party details
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (courtCase == null)
         {
-            var courtCase = await _context.CourtCases
-                .Include(c => c.AssignedJudge)
-                .Include(c => c.Hearings)
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (courtCase == null)
-            {
-                return NotFound(); // Returns 404
-            }
-
-            var caseDto = new CaseDto
-            {
-                Id = courtCase.Id,
-                CaseNumber = courtCase.CaseNumber,
-                Title = courtCase.Title,
-                Status = courtCase.Status,
-                FilingDate = courtCase.FilingDate,
-                AssignedJudgeName = courtCase.AssignedJudge != null 
-                    ? $"{courtCase.AssignedJudge.FirstName} {courtCase.AssignedJudge.LastName}" 
-                    : "Unassigned",
-                AssignedJudgeId = courtCase.AssignedJudgeId
-            };
-
-            return Ok(caseDto);
+            return NotFound();
         }
+
+        var caseDetailDto = new CaseDetailDto
+        {
+            Id = courtCase.Id,
+            CaseNumber = courtCase.CaseNumber,
+            Title = courtCase.Title,
+            Status = courtCase.Status,
+            FilingDate = courtCase.FilingDate,
+            CreatedDate = courtCase.CreatedDate,
+            LastModifiedDate = courtCase.LastModifiedDate,
+            AssignedJudgeName = courtCase.AssignedJudge != null 
+                ? $"{courtCase.AssignedJudge.FirstName} {courtCase.AssignedJudge.LastName}" 
+                : "Unassigned",
+            
+            // Map parties
+            Parties = courtCase.CaseParties.Select(cp => new CasePartyDto
+            {
+                PartyId = cp.PartyId,
+                FullName = $"{cp.Party.FirstName} {cp.Party.LastName}",
+                Role = cp.Role
+            }).ToList(),
+            
+            // Map hearings
+            Hearings = courtCase.Hearings.Select(h => new HearingDto
+            {
+                Id = h.Id,
+                Description = h.Description,
+                HearingDate = h.HearingDate,
+                Location = h.Location
+            }).ToList()
+        };
+
+        return Ok(caseDetailDto);
+    }
 
         // POST: api/cases
         [HttpPost]
