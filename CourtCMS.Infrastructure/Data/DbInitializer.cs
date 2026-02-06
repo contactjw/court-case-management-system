@@ -48,6 +48,105 @@ namespace CourtCMS.Infrastructure.Data
 
             context.CourtCases.AddRange(cases);
             context.SaveChanges();
+
+            var parties = new Party[]
+            {
+                new Party 
+                { 
+                    FirstName = "John", 
+                    LastName = "Doe", 
+                    Email = "john.doe@email.com", 
+                    Phone = "714-555-0001",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new Party 
+                { 
+                    FirstName = "Jane", 
+                    LastName = "Smith", 
+                    Email = "jane.smith@email.com", 
+                    Phone = "714-555-0002",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new Party 
+                { 
+                    FirstName = "ABC", 
+                    LastName = "Construction Inc.", 
+                    Email = "contact@abcconstruction.com", 
+                    Phone = "714-555-0100",
+                    CreatedDate = DateTime.UtcNow
+                }
+            };
+
+            context.Parties.AddRange(parties);
+            context.SaveChanges();
+
+            // Link parties to cases
+            var caseParties = new CaseParty[]
+            {
+                new CaseParty 
+                { 
+                    CourtCaseId = cases[0].Id, 
+                    PartyId = parties[2].Id, 
+                    Role = "Defendant",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new CaseParty 
+                { 
+                    CourtCaseId = cases[0].Id, 
+                    PartyId = parties[0].Id, 
+                    Role = "Plaintiff",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new CaseParty 
+                { 
+                    CourtCaseId = cases[1].Id, 
+                    PartyId = parties[0].Id, 
+                    Role = "Petitioner",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new CaseParty 
+                { 
+                    CourtCaseId = cases[1].Id, 
+                    PartyId = parties[1].Id, 
+                    Role = "Respondent",
+                    CreatedDate = DateTime.UtcNow
+                }
+            };
+
+            context.CaseParties.AddRange(caseParties);
+            context.SaveChanges();
+
+            // Create sample hearings
+            var hearings = new Hearing[]
+            {
+                new Hearing 
+                { 
+                    CourtCaseId = cases[0].Id,
+                    Description = "Preliminary Hearing",
+                    HearingDate = DateTime.UtcNow.AddDays(30),
+                    Location = "Courtroom 101",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new Hearing 
+                { 
+                    CourtCaseId = cases[0].Id,
+                    Description = "Motion to Dismiss",
+                    HearingDate = DateTime.UtcNow.AddDays(45),
+                    Location = "Courtroom 101",
+                    CreatedDate = DateTime.UtcNow
+                },
+                new Hearing 
+                { 
+                    CourtCaseId = cases[1].Id,
+                    Description = "Final Settlement Conference",
+                    HearingDate = DateTime.UtcNow.AddDays(-60),
+                    Location = "Courtroom 303",
+                    CreatedDate = DateTime.UtcNow
+                }
+            };
+
+            context.Hearings.AddRange(hearings);
+            context.SaveChanges();
         }
     }
 }
