@@ -77,6 +77,7 @@ $danger-red: #dc3545;
 
   input {
     width: 100%;
+    box-sizing: border-box; // ← FIX: Include padding inside the width
     padding: 0.6rem 0.75rem;
     border: 1px solid $border-color;
     border-radius: 4px;
