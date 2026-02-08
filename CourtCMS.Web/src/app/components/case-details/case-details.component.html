@@ -66,12 +66,34 @@
 
     <!-- Hearings Section -->
     <section class="section">
-      <h3>Scheduled Hearings</h3>
+      <div class="section-header">
+        <h3>Scheduled Hearings</h3>
+        <button class="btn-add-hearing" (click)="openAddHearingModal()">+ Add Hearing</button>
+      </div>
+
       @if (caseData.hearings.length > 0) {
         <div class="hearings-grid">
           @for (hearing of caseData.hearings; track hearing.id) {
             <div class="hearing-card">
-              <h4>{{ hearing.description }}</h4>
+              <div class="hearing-card-header">
+                <h4>{{ hearing.description }}</h4>
+                <div class="hearing-actions">
+                  <button
+                    class="btn-hearing-edit"
+                    (click)="openEditHearingModal(hearing)"
+                    title="Edit Hearing"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="btn-hearing-delete"
+                    (click)="deleteHearing(hearing)"
+                    title="Delete Hearing"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
               <p>
                 <strong>Date:</strong>
                 {{ hearing.hearingDate | date: 'full' }}
@@ -92,5 +114,16 @@
     <div class="actions">
       <button routerLink="/" class="btn-back">← Back to Case List</button>
     </div>
+
+    <!-- Hearing Form Modal -->
+    <!-- This is rendered here but HIDDEN until isModalOpen becomes true. -->
+    <!-- Notice how the parent passes data DOWN via [inputs] -->
+    <!-- and listens for events UP via (outputs) -->
+    <app-hearing-form-modal
+      [isOpen]="isModalOpen"
+      [hearing]="selectedHearing"
+      (closeModal)="closeHearingModal()"
+      (save)="onHearingSave($event)"
+    />
   }
 </div>
