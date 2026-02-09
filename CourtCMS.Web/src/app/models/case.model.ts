@@ -7,8 +7,6 @@ export interface Case {
   assignedJudgeName: string;
 
   assignedJudgeId?: number;
-
-  isEditing?: boolean;
 }
 
 export interface CreateCaseRequest {

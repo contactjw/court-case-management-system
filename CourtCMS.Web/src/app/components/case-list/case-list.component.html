@@ -1,46 +1,10 @@
 <div class="container">
-  <h1>Orange County Superior Court</h1>
-  <h2>Case Management Dashboard</h2>
-
-  <div class="form-container">
-    <h3>File New Case</h3>
-
-    <form (ngSubmit)="createCase()">
-      <div class="form-group">
-        <label>Case Number:</label>
-        <input
-          type="text"
-          [(ngModel)]="newCaseModel.caseNumber"
-          name="caseNumber"
-          required
-          placeholder="e.g. 2024-C-999"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Title:</label>
-        <input
-          type="text"
-          [(ngModel)]="newCaseModel.title"
-          name="title"
-          required
-          placeholder="e.g. State vs. Jones"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Judge:</label>
-        <select [(ngModel)]="newCaseModel.assignedJudgeId" name="judgeId" required>
-          <option [ngValue]="null" disabled>-- Select a Judge --</option>
-
-          @for (judge of judges; track judge.id) {
-            <option [ngValue]="judge.id">{{ judge.fullName }}</option>
-          }
-        </select>
-      </div>
-
-      <button type="submit">File Case</button>
-    </form>
+  <div class="page-header">
+    <div>
+      <h1>Orange County Superior Court</h1>
+      <h2>Case Management Dashboard</h2>
+    </div>
+    <button class="btn-file-case" (click)="openCreateModal()">+ File New Case</button>
   </div>
 
   <div class="card-grid">
@@ -48,67 +12,37 @@
       <div class="case-card">
         <h3>{{ courtCase.caseNumber }}</h3>
 
-        @if (!courtCase.isEditing) {
-          <p><strong>Title:</strong> {{ courtCase.title }}</p>
-          <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
-          <p><strong>Filing Date:</strong> {{ courtCase.filingDate | date: 'mediumDate' }}</p>
+        <p><strong>Title:</strong> {{ courtCase.title }}</p>
+        <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
+        <p><strong>Filing Date:</strong> {{ courtCase.filingDate | date: 'mediumDate' }}</p>
 
-          <div class="button-row">
-            <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
-              {{ courtCase.status }}
-            </span>
+        <div class="button-row">
+          <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
+            {{ courtCase.status }}
+          </span>
 
-            <button class="btn-edit" (click)="enableEdit(courtCase)">Edit</button>
+          <button class="btn-edit" (click)="openEditModal(courtCase)">Edit</button>
 
-            <button class="btn-view" [routerLink]="['/cases', courtCase.id]">View Details</button>
+          <button class="btn-view" [routerLink]="['/cases', courtCase.id]">View Details</button>
 
-            @if (courtCase.status !== 'Closed') {
-              <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
-            }
+          @if (courtCase.status !== 'Closed') {
+            <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
+          }
 
-            <button class="btn-delete" (click)="deleteCase(courtCase)">Delete</button>
-          </div>
-        }
-
-        @if (courtCase.isEditing) {
-          <div class="edit-form">
-            <div class="form-group-sm">
-              <label>Case #:</label>
-              <input type="text" [(ngModel)]="courtCase.caseNumber" />
-            </div>
-
-            <div class="form-group-sm">
-              <label>Title:</label>
-              <input type="text" [(ngModel)]="courtCase.title" />
-            </div>
-
-            <div class="form-group-sm">
-              <label>Judge:</label>
-              <select [(ngModel)]="courtCase.assignedJudgeId">
-                @for (judge of judges; track judge.id) {
-                  <option [ngValue]="judge.id">{{ judge.fullName }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-group-sm">
-              <label>Status:</label>
-              <select [(ngModel)]="courtCase.status">
-                @for (stat of statuses; track stat) {
-                  <option [value]="stat">{{ stat }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="edit-actions">
-              <button class="btn-save" (click)="saveCase(courtCase)">Save</button>
-              <button class="btn-cancel" (click)="cancelEdit(courtCase)">Cancel</button>
-            </div>
-          </div>
-        }
+          <button class="btn-delete" (click)="deleteCase(courtCase)">Delete</button>
+        </div>
       </div>
     } @empty {
       <p>No cases found. Is the backend running?</p>
     }
   </div>
+
+  <!-- Case Form Modal -->
+  <app-case-form-modal
+    [isOpen]="isModalOpen"
+    [courtCase]="selectedCase"
+    [judges]="judges"
+    (closeModal)="closeModal()"
+    (save)="onCaseSave($event)"
+  />
 </div>

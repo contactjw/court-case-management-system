@@ -1,29 +1,24 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CaseService } from '../../services/case.service';
-import { Case, CreateCaseRequest } from '../../models/case.model';
+import { Case } from '../../models/case.model';
+import { CaseFormModalComponent, CaseFormData } from '../case-form-modal/case-form-modal.component';
 
 @Component({
   selector: 'app-case-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule, CaseFormModalComponent],
   templateUrl: './case-list.component.html',
   styleUrl: './case-list.component.scss',
 })
 export class CaseListComponent implements OnInit {
-  title = 'Court Case Management System';
   cases: Case[] = [];
+  judges: { id: number; fullName: string }[] = [];
 
-  newCaseModel: CreateCaseRequest = {
-    caseNumber: '',
-    title: '',
-    assignedJudgeId: null,
-  };
-
-  judges: any[] = [];
-  statuses = ['Open', 'Closed', 'Suspended'];
+  // --- MODAL STATE ---
+  isModalOpen = false;
+  selectedCase: Case | null = null;
 
   constructor(
     private caseService: CaseService,
@@ -54,16 +49,89 @@ export class CaseListComponent implements OnInit {
     });
   }
 
-  createCase(): void {
-    this.caseService.createCase(this.newCaseModel).subscribe({
+  // --- MODAL CONTROLS ---
+
+  openCreateModal(): void {
+    this.selectedCase = null;
+    this.isModalOpen = true;
+  }
+
+  openEditModal(courtCase: Case): void {
+    this.selectedCase = courtCase;
+    this.isModalOpen = true;
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.selectedCase = null;
+  }
+
+  // --- CRUD OPERATIONS ---
+
+  // The modal emits CaseFormData. This method figures out whether
+  // to call Create or Update based on whether a case was selected.
+  onCaseSave(formData: CaseFormData): void {
+    if (this.selectedCase) {
+      this.updateCase(this.selectedCase.id, formData);
+    } else {
+      this.createCase(formData);
+    }
+  }
+
+  private createCase(formData: CaseFormData): void {
+    const createRequest = {
+      caseNumber: formData.caseNumber,
+      title: formData.title,
+      assignedJudgeId: formData.assignedJudgeId,
+    };
+
+    this.caseService.createCase(createRequest).subscribe({
       next: (createdCase) => {
-        console.log('Case created successfully:', createdCase);
+        // Add to top of list so the newest case appears first
         this.cases.unshift(createdCase);
-        this.newCaseModel = { caseNumber: '', title: '', assignedJudgeId: null };
+        this.closeModal();
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error creating case:', err);
+        alert('Failed to create case. Please try again.');
+      },
+    });
+  }
+
+  private updateCase(id: number, formData: CaseFormData): void {
+    const updateData = {
+      caseNumber: formData.caseNumber,
+      title: formData.title,
+      assignedJudgeId: formData.assignedJudgeId,
+      status: formData.status ?? 'Open',
+    };
+
+    this.caseService.updateCase(id, updateData).subscribe({
+      next: () => {
+        // Optimistic update: apply changes to local data immediately
+        const caseToUpdate = this.cases.find((c) => c.id === id);
+
+        if (caseToUpdate) {
+          caseToUpdate.caseNumber = formData.caseNumber;
+          caseToUpdate.title = formData.title;
+          caseToUpdate.assignedJudgeId = formData.assignedJudgeId ?? undefined;
+          caseToUpdate.status = formData.status ?? caseToUpdate.status;
+
+          // Look up the judge name from our local judges array
+          // so the card immediately reflects the new judge
+          const selectedJudge = this.judges.find((j) => j.id === formData.assignedJudgeId);
+          if (selectedJudge) {
+            caseToUpdate.assignedJudgeName = selectedJudge.fullName;
+          }
+        }
+
+        this.closeModal();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Update failed:', err);
+        alert('Failed to update case. Please try again.');
       },
     });
   }
@@ -72,7 +140,7 @@ export class CaseListComponent implements OnInit {
     const updateData = {
       caseNumber: courtCase.caseNumber,
       title: courtCase.title,
-      assignedJudgeId: courtCase.assignedJudgeId,
+      assignedJudgeId: courtCase.assignedJudgeId ?? null,
       status: 'Closed',
     };
 
@@ -90,53 +158,16 @@ export class CaseListComponent implements OnInit {
       `Are you sure you want to delete Case ${courtCase.caseNumber}?\n\nThis action cannot be undone.`,
     );
 
-    if (!isConfirmed) {
-      return;
-    }
+    if (!isConfirmed) return;
 
     this.caseService.deleteCase(courtCase.id).subscribe({
       next: () => {
         this.cases = this.cases.filter((c) => c.id !== courtCase.id);
-        console.log('Case deleted (soft delete)');
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error deleting case:', err);
         alert('Could not delete case. Check console for details.');
-      },
-    });
-  }
-
-  enableEdit(courtCase: Case): void {
-    courtCase.isEditing = true;
-  }
-
-  cancelEdit(courtCase: Case): void {
-    courtCase.isEditing = false;
-  }
-
-  saveCase(courtCase: Case): void {
-    const updateData = {
-      caseNumber: courtCase.caseNumber,
-      title: courtCase.title,
-      status: courtCase.status,
-      assignedJudgeId: courtCase.assignedJudgeId,
-    };
-
-    this.caseService.updateCase(courtCase.id, updateData).subscribe({
-      next: () => {
-        const selectedJudge = this.judges.find((j) => j.id == courtCase.assignedJudgeId);
-        if (selectedJudge) {
-          courtCase.assignedJudgeName = selectedJudge.fullName;
-        }
-
-        console.log('Case updated successfully');
-        courtCase.isEditing = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Update failed', err);
-        alert('Failed to update case');
       },
     });
   }
