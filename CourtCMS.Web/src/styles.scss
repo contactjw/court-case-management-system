@@ -1,6 +1,30 @@
-/* You can add global styles to this file, and also import other style files */
-// *,
-// *::before,
-// *::after {
-//   box-sizing: border-box;
-// }
+// --- GLOBAL RESET ---
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  // Sets a consistent base font size. All 'rem' units
+  // throughout the app are relative to this value.
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family:
+    'Segoe UI',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  // Subtle warm gray background — gives the white cards visual "lift"
+  // without the page feeling stark or empty. This is a small detail
+  // that separates polished apps from plain ones.
+  background-color: #f1f3f5;
+  color: #333;
+  line-height: 1.5;
+}

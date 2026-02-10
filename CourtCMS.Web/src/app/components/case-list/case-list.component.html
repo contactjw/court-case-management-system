@@ -1,48 +1,102 @@
-<div class="container">
-  <div class="page-header">
+<!-- TOP NAVIGATION BAR -->
+<nav class="top-nav">
+  <div class="nav-content">
+    <div class="nav-brand">
+      <span class="brand-icon">⚖</span>
+      <div>
+        <h1>CourtCMS</h1>
+        <p>County Superior Court</p>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT AREA -->
+<main class="main-content">
+  <!-- DASHBOARD HEADER: Stats + Action Button -->
+  <div class="dashboard-header">
     <div>
-      <h1>Orange County Superior Court</h1>
-      <h2>Case Management Dashboard</h2>
+      <h2>Case Dashboard</h2>
+      <p class="subtitle">Manage and track all active court cases</p>
     </div>
     <button class="btn-file-case" (click)="openCreateModal()">+ File New Case</button>
   </div>
 
+  <!-- STATS BAR -->
+  <!-- This section demonstrates data-driven UI thinking.
+       Hiring managers love seeing this because it shows you
+       think beyond basic CRUD. -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <span class="stat-number">{{ totalCases }}</span>
+      <span class="stat-label">Total Cases</span>
+    </div>
+    <div class="stat-card stat-open">
+      <span class="stat-number">{{ openCases }}</span>
+      <span class="stat-label">Open</span>
+    </div>
+    <div class="stat-card stat-closed">
+      <span class="stat-number">{{ closedCases }}</span>
+      <span class="stat-label">Closed</span>
+    </div>
+  </div>
+
+  <!-- CASE CARDS GRID -->
   <div class="card-grid">
     @for (courtCase of cases; track courtCase.id) {
       <div class="case-card">
-        <h3>{{ courtCase.caseNumber }}</h3>
-
-        <p><strong>Title:</strong> {{ courtCase.title }}</p>
-        <p><strong>Judge:</strong> {{ courtCase.assignedJudgeName }}</p>
-        <p><strong>Filing Date:</strong> {{ courtCase.filingDate | date: 'mediumDate' }}</p>
-
-        <div class="button-row">
-          <span class="status-badge" [class.closed]="courtCase.status === 'Closed'">
+        <div class="card-top-row">
+          <h3>{{ courtCase.caseNumber }}</h3>
+          <span
+            class="status-badge"
+            [class.closed]="courtCase.status === 'Closed'"
+            [class.suspended]="courtCase.status === 'Suspended'"
+          >
             {{ courtCase.status }}
           </span>
+        </div>
 
-          <button class="btn-edit" (click)="openEditModal(courtCase)">Edit</button>
+        <p class="case-title">{{ courtCase.title }}</p>
 
-          <button class="btn-view" [routerLink]="['/cases', courtCase.id]">View Details</button>
+        <div class="case-meta">
+          <p>
+            <span class="meta-label">Judge</span>
+            {{ courtCase.assignedJudgeName }}
+          </p>
+          <p>
+            <span class="meta-label">Filed</span>
+            {{ courtCase.filingDate | date: 'mediumDate' }}
+          </p>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-action btn-view" [routerLink]="['/cases', courtCase.id]">View</button>
+          <button class="btn-action btn-edit" (click)="openEditModal(courtCase)">Edit</button>
 
           @if (courtCase.status !== 'Closed') {
-            <button class="btn-close" (click)="closeCase(courtCase)">Close Case</button>
+            <button class="btn-action btn-close-case" (click)="closeCase(courtCase)">Close</button>
           }
 
-          <button class="btn-delete" (click)="deleteCase(courtCase)">Delete</button>
+          <button class="btn-action btn-delete" (click)="deleteCase(courtCase)">Delete</button>
         </div>
       </div>
     } @empty {
-      <p>No cases found. Is the backend running?</p>
+      <div class="empty-state">
+        <p class="empty-icon">📋</p>
+        <p class="empty-title">No cases found</p>
+        <p class="empty-subtitle">
+          File a new case to get started, or check that the backend is running.
+        </p>
+      </div>
     }
   </div>
+</main>
 
-  <!-- Case Form Modal -->
-  <app-case-form-modal
-    [isOpen]="isModalOpen"
-    [courtCase]="selectedCase"
-    [judges]="judges"
-    (closeModal)="closeModal()"
-    (save)="onCaseSave($event)"
-  />
-</div>
+<!-- Case Form Modal -->
+<app-case-form-modal
+  [isOpen]="isModalOpen"
+  [courtCase]="selectedCase"
+  [judges]="judges"
+  (closeModal)="closeModal()"
+  (save)="onCaseSave($event)"
+/>

@@ -16,6 +16,20 @@ export class CaseListComponent implements OnInit {
   cases: Case[] = [];
   judges: { id: number; fullName: string }[] = [];
 
+  // --- COMPUTED STATS ---
+  // Getters are recalculated every time Angular checks for changes.
+  get totalCases(): number {
+    return this.cases.length;
+  }
+
+  get openCases(): number {
+    return this.cases.filter((c) => c.status === 'Open').length;
+  }
+
+  get closedCases(): number {
+    return this.cases.filter((c) => c.status === 'Closed').length;
+  }
+
   // --- MODAL STATE ---
   isModalOpen = false;
   selectedCase: Case | null = null;

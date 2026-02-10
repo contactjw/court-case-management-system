@@ -1,212 +1,383 @@
-$court-blue: #003366;
-$gov-gray: #f0f0f0;
+// --- DESIGN TOKENS ---
+// Centralized variables make the design easy to tweak.
+// Change $navy here and it updates everywhere.
+$navy: #0f2b46;
+$navy-light: #1a3a5c;
+$accent-blue: #3b82f6;
+$success: #16a34a;
+$warning: #f59e0b;
+$danger: #dc2626;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-500: #6b7280;
+$gray-700: #374151;
+$gray-900: #111827;
+$radius: 8px;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-.container {
+// --- TOP NAVIGATION BAR ---
+.top-nav {
+  background: $navy;
+  color: white;
+  padding: 0.85rem 2rem;
+  // Subtle bottom shadow gives the nav a sense of elevation,
+  // making it feel "above" the page content.
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .brand-icon {
+    font-size: 1.75rem;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  p {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin: 0;
+    line-height: 1.2;
+  }
+}
+
+// --- MAIN CONTENT AREA ---
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-h1 {
-  color: $court-blue;
-  margin-bottom: 0.5rem;
+// --- DASHBOARD HEADER ---
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  .subtitle {
+    color: $gray-500;
+    font-size: 0.9rem;
+    margin: 0.2rem 0 0 0;
+  }
 }
 
+.btn-file-case {
+  background-color: $accent-blue;
+  color: white;
+  padding: 0.65rem 1.35rem;
+  border: none;
+  border-radius: $radius;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+  box-shadow: $shadow-sm;
+
+  &:hover {
+    background-color: darken($accent-blue, 8%);
+    box-shadow: $shadow-md;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// --- STATS BAR ---
+// The stats bar is a grid of 3 cards that summarize case data at a glance.
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.25rem;
+  border-radius: $radius;
+  box-shadow: $shadow-sm;
+  border: 1px solid $gray-200;
+  display: flex;
+  flex-direction: column;
+  // Left border accent — a subtle design touch that adds
+  // visual interest and helps differentiate the cards.
+  border-left: 4px solid $navy;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $gray-900;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: $gray-500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-top: 0.35rem;
+  }
+
+  // Color-coded left borders for each stat type
+  &.stat-open {
+    border-left-color: $success;
+
+    .stat-number {
+      color: $success;
+    }
+  }
+
+  &.stat-closed {
+    border-left-color: $gray-500;
+
+    .stat-number {
+      color: $gray-500;
+    }
+  }
+}
+
+// --- CARD GRID ---
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
 }
 
 .case-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1.5rem;
   background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  border: 1px solid $gray-200;
+  border-radius: $radius;
+  padding: 1.5rem;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  h3 {
-    margin-top: 0;
-    color: $court-blue;
-    border-bottom: 2px solid $gov-gray;
-    padding-bottom: 0.5rem;
+    box-shadow: $shadow-md;
+    border-color: $gray-300;
   }
 }
 
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $navy;
+    // Monospace font for case numbers gives them a "document ID" feel.
+    // It's a small touch that reinforces the legal/official aesthetic.
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+}
+
+.case-title {
+  font-size: 1rem;
+  color: $gray-700;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+// --- STATUS BADGES ---
 .status-badge {
   display: inline-block;
-  background-color: #28a745;
-  color: white;
-  padding: 0.25rem 0.75rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 50px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  white-space: nowrap; // ✅ FIX: Prevents "Suspended" from wrapping
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  // Default: Open status
+  background-color: rgba(22, 163, 74, 0.1);
+  color: $success;
 
   &.closed {
-    background-color: #6c757d;
+    background-color: rgba(107, 114, 128, 0.1);
+    color: $gray-500;
+  }
+
+  &.suspended {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: $warning;
   }
 }
 
-.form-container {
-  background-color: #f8f9fa; // Light gray background
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  margin-bottom: 2rem; // Space between form and list
-  max-width: 500px; // Don't let the form get too wide
-
-  h3 {
-    margin-top: 0;
-    color: $court-blue;
-  }
-}
-
-.form-group {
+// --- CASE METADATA ---
+.case-meta {
+  padding: 0.85rem 0;
+  border-top: 1px solid $gray-100;
+  border-bottom: 1px solid $gray-100;
   margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
 
-  label {
-    display: block; // Force label to be on its own line
-    font-weight: bold;
-    margin-bottom: 0.25rem;
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: $gray-700;
   }
 
-  input {
-    width: 100%; // Input takes full width of container
-    padding: 0.5rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-  }
-}
-
-button {
-  background-color: $court-blue;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer; // Show hand icon on hover
-
-  &:hover {
-    background-color: darken($court-blue, 10%);
+  .meta-label {
+    display: block;
+    font-size: 0.72rem;
+    color: $gray-500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    margin-bottom: 0.15rem;
   }
 }
 
-.btn-close {
-  background-color: #dc3545; // Red
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding: 0.35rem 0.75rem;
-  border-radius: 50px;
-  white-space: nowrap; // ✅ FIX: Prevents "Close Case" from becoming 2 lines
-
-  &:hover {
-    background-color: #c82333;
-  }
-}
-
-.button-row {
-  margin-top: 1rem;
+// --- CARD ACTION BUTTONS ---
+.card-actions {
   display: flex;
-  align-items: center;
-  gap: 0.5rem; // Space between buttons
-  flex-wrap: wrap; // ✅ FIX: Allows buttons to drop to next line if space is tight
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  // Push actions to the bottom of the card. This works because
+  // the card is display: flex with flex-direction: column.
+  // margin-top: auto eats all remaining space above the actions.
+  margin-top: auto;
+}
+
+.btn-action {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  // "Ghost" button style by default — outlined, not filled.
+  // This keeps the card feeling clean. The filled status badge
+  // remains the visual focal point, not the buttons.
+  background: transparent;
+}
+
+.btn-view {
+  color: $accent-blue;
+  border-color: $accent-blue;
+
+  &:hover {
+    background-color: $accent-blue;
+    color: white;
+  }
 }
 
 .btn-edit {
-  background-color: #ffc107; // Yellow/Orange
-  color: #000;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.85rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  line-height: 1.2;
-  white-space: nowrap; // ✅ FIX: Keeps button wide, prevents tallness
+  color: $warning;
+  border-color: $warning;
 
   &:hover {
-    background-color: darken(#ffc107, 5%);
+    background-color: $warning;
+    color: white;
   }
 }
 
-.btn-save {
-  background-color: #28a745; // Green
-  color: white;
-  margin-right: 0.5rem;
-}
+.btn-close-case {
+  color: $gray-500;
+  border-color: $gray-300;
 
-.btn-cancel {
-  background-color: #6c757d; // Gray
-  color: white;
-}
-
-.edit-form {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px dashed #ccc;
-
-  input {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-}
-
-.form-group-sm {
-  margin-bottom: 0.5rem;
-
-  label {
-    font-size: 0.8rem;
-    color: #666;
-    display: block;
-  }
-
-  input,
-  select {
-    width: 100%;
-    padding: 0.25rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  &:hover {
+    background-color: $gray-500;
+    color: white;
   }
 }
 
 .btn-delete {
-  background-color: #dc3545; // Danger Red
-  color: white;
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding: 0.35rem 0.75rem;
-  border-radius: 50px;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap; // ✅ FIX: Keeps delete button consistent
+  color: $danger;
+  border-color: $danger;
 
   &:hover {
-    background-color: #bb2d3b; // Darker red on hover
+    background-color: $danger;
+    color: white;
   }
 }
 
-.btn-view {
-  background-color: #17a2b8; // Info blue
-  color: white;
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding: 0.35rem 0.75rem;
-  border-radius: 50px;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
+// --- EMPTY STATE ---
+.empty-state {
+  // Span all grid columns so the empty state is centered
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: $radius;
+  border: 2px dashed $gray-300;
 
-  &:hover {
-    background-color: #138496;
-    transform: translateY(-1px);
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $gray-700;
+    margin-bottom: 0.25rem;
+  }
+
+  .empty-subtitle {
+    color: $gray-500;
+    font-size: 0.9rem;
+  }
+}
+
+// --- RESPONSIVE ADJUSTMENTS ---
+// On small screens, stack the dashboard header and reduce the stats grid.
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .stats-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .case-meta {
+    grid-template-columns: 1fr;
   }
 }
