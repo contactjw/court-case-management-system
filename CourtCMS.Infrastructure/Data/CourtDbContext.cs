@@ -34,7 +34,7 @@ namespace CourtCMS.Infrastructure.Data
             modelBuilder.Entity<CourtCase>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<Judge>().HasQueryFilter(j => !j.IsDeleted);
             modelBuilder.Entity<Hearing>().HasQueryFilter(h => !h.IsDeleted);
-            
+            modelBuilder.Entity<Party>().HasQueryFilter(p =>!p.IsDeleted);
         }
     }
 }
