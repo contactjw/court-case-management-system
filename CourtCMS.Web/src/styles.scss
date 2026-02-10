@@ -8,8 +8,8 @@
 }
 
 html {
-  // Sets a consistent base font size. All 'rem' units
-  // throughout the app are relative to this value.
+  // Set a consistent base font size.
+  // All 'rem' units throughout the app are relative to this value.
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -21,9 +21,8 @@ body {
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  // Subtle warm gray background — gives the white cards visual "lift"
-  // without the page feeling stark or empty. This is a small detail
-  // that separates polished apps from plain ones.
+  // Subtle warm gray background.
+  // Gives the white cards visual "lift" without the page feeling empty.
   background-color: #f1f3f5;
   color: #333;
   line-height: 1.5;

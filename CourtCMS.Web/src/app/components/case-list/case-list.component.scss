@@ -1,6 +1,4 @@
 // --- DESIGN TOKENS ---
-// Centralized variables make the design easy to tweak.
-// Change $navy here and it updates everywhere.
 $navy: #0f2b46;
 $navy-light: #1a3a5c;
 $accent-blue: #3b82f6;
@@ -291,8 +289,6 @@ $shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
   white-space: nowrap;
   transition: all 0.15s;
   // "Ghost" button style by default — outlined, not filled.
-  // This keeps the card feeling clean. The filled status badge
-  // remains the visual focal point, not the buttons.
   background: transparent;
 }
 
