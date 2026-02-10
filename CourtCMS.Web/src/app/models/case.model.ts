@@ -40,3 +40,18 @@ export interface CaseDetail {
   parties: CaseParty[];
   hearings: Hearing[];
 }
+
+export interface Party {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+export interface CreatePartyRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}

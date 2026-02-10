@@ -3,12 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using CourtCMS.Infrastructure.Data;
 using CourtCMS.Domain.Entities;
 using CourtCMS.Application.DTOs;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace CourtCMS.Api.Controllers
 {
     [ApiController]
-    [Route("api/cases/{caseId}/parties")]
+    [Route("api/[controller]")]
     public class PartiesController : ControllerBase
     {
         private readonly CourtDbContext _context;
@@ -27,18 +26,19 @@ namespace CourtCMS.Api.Controllers
                 .OrderBy(p => p.LastName)
                 .ThenBy(p => p.FirstName)
                 .Select(p => new PartyListDto
-            {
-                Id = p.Id,
-                FirstName = p.FirstName,
-                LastName = p.LastName,
-                Email = p.Email,
-                Phone = p.Phone
-            }).ToListAsync();
+                {
+                    Id = p.Id,
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Email = p.Email,
+                    Phone = p.Phone
+                })
+                .ToListAsync();
 
             return Ok(parties);
         }
 
-        // GET api/parties/5
+        // GET: api/parties/5
         // Returns a single party by ID
         [HttpGet("{id}")]
         public async Task<ActionResult<PartyListDto>> GetParty(int id)
@@ -54,7 +54,7 @@ namespace CourtCMS.Api.Controllers
                     Phone = p.Phone
                 })
                 .FirstOrDefaultAsync();
-        
+
             if (party == null)
             {
                 return NotFound($"Party with ID {id} not found.");

@@ -1,0 +1,77 @@
+<!-- TOP NAVIGATION BAR -->
+<nav class="top-nav">
+  <div class="nav-content">
+    <div class="nav-brand">
+      <span class="brand-icon">⚖</span>
+      <div>
+        <h1>CourtCMS</h1>
+        <p>Orange County Superior Court</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a routerLink="/" class="nav-link">Cases</a>
+      <a routerLink="/parties" class="nav-link active">Parties</a>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+  <div class="page-header">
+    <div>
+      <h2>Party Directory</h2>
+      <p class="subtitle">Manage individuals and organizations involved in court cases</p>
+    </div>
+    <button class="btn-add" (click)="openCreateModal()">+ Add Party</button>
+  </div>
+
+  <!-- PARTY TABLE -->
+  <!-- Tables are better than cards for party data because parties
+       have uniform fields (name, email, phone). Cards work well when
+       each item has variable content (like cases with different statuses
+       and actions). Tables excel at scannable, uniform data. -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (party of parties; track party.id) {
+          <tr>
+            <td class="name-cell">
+              <strong>{{ party.lastName }}</strong
+              >, {{ party.firstName }}
+            </td>
+            <td>{{ party.email }}</td>
+            <td>{{ party.phone }}</td>
+            <td class="actions-cell">
+              <button class="btn-action btn-edit" (click)="openEditModal(party)">Edit</button>
+              <button class="btn-action btn-delete" (click)="deleteParty(party)">Delete</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="empty-state">
+              <p class="empty-icon">👤</p>
+              <p class="empty-title">No parties found</p>
+              <p class="empty-subtitle">Add a party to get started.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Party Form Modal -->
+<app-party-form-modal
+  [isOpen]="isModalOpen"
+  [party]="selectedParty"
+  (closeModal)="closeModal()"
+  (save)="onPartySave($event)"
+/>
