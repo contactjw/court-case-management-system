@@ -143,6 +143,13 @@ $danger-red: #dc3545;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
+
+  &:disabled {
+    background-color: #93c5fd; // Lighter blue — visually "faded"
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 }
 
 @keyframes fadeIn {
@@ -162,5 +169,76 @@ $danger-red: #dc3545;
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// --- SAVE STATE FEEDBACK ---
+
+.save-success {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+
+  .success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #dcfce7;
+    color: #16a34a;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .success-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.35rem 0;
+  }
+
+  .success-subtitle {
+    font-size: 0.92rem;
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+.save-error-banner {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+}
+
+// When the form is disabled during save, fade it slightly
+// so the user gets a visual cue that they can't interact
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Native fieldset reset — removes default browser chrome
+// while letting us use its [disabled] behavior
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
   }
 }

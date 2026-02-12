@@ -1,7 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { finalize, forkJoin, timer } from 'rxjs';
 import { CaseService } from '../../services/case.service';
+import { ToastService } from '../../services/toast.service';
 import { Case } from '../../models/case.model';
 import { CaseFormModalComponent, CaseFormData } from '../case-form-modal/case-form-modal.component';
 
@@ -17,7 +19,6 @@ export class CaseListComponent implements OnInit {
   judges: { id: number; fullName: string }[] = [];
 
   // --- COMPUTED STATS ---
-  // Getters are recalculated every time Angular checks for changes.
   get totalCases(): number {
     return this.cases.length;
   }
@@ -33,9 +34,11 @@ export class CaseListComponent implements OnInit {
   // --- MODAL STATE ---
   isModalOpen = false;
   selectedCase: Case | null = null;
+  isSaving = false;
 
   constructor(
     private caseService: CaseService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -67,24 +70,28 @@ export class CaseListComponent implements OnInit {
 
   openCreateModal(): void {
     this.selectedCase = null;
+    this.isSaving = false;
     this.isModalOpen = true;
   }
 
   openEditModal(courtCase: Case): void {
     this.selectedCase = courtCase;
+    this.isSaving = false;
     this.isModalOpen = true;
   }
 
   closeModal(): void {
     this.isModalOpen = false;
     this.selectedCase = null;
+    this.isSaving = false;
   }
 
   // --- CRUD OPERATIONS ---
 
-  // The modal emits CaseFormData. This method figures out whether
-  // to call Create or Update based on whether a case was selected.
   onCaseSave(formData: CaseFormData): void {
+    if (this.isSaving) return;
+    this.isSaving = true;
+
     if (this.selectedCase) {
       this.updateCase(this.selectedCase.id, formData);
     } else {
@@ -99,18 +106,27 @@ export class CaseListComponent implements OnInit {
       assignedJudgeId: formData.assignedJudgeId,
     };
 
-    this.caseService.createCase(createRequest).subscribe({
-      next: (createdCase) => {
-        // Add to top of list so the newest case appears first
-        this.cases.unshift(createdCase);
-        this.closeModal();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error creating case:', err);
-        alert('Failed to create case. Please try again.');
-      },
-    });
+    forkJoin({
+      api: this.caseService.createCase(createRequest),
+      delay: timer(500), // Minimum 0.5 second (use 1000 for 1 second, 2000 for 2 seconds, etc.)
+    })
+      .pipe(finalize(() => (this.isSaving = false)))
+      .subscribe({
+        next: ({ api: createdCase }) => {
+          // ← Destructure to get the API result
+          this.isSaving = false;
+          this.cases.unshift(createdCase);
+          this.closeModal();
+          this.toastService.success(`Case ${createdCase.caseNumber} filed successfully.`);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Error creating case:', err);
+          this.toastService.error('Failed to create case. Please try again.');
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   private updateCase(id: number, formData: CaseFormData): void {
@@ -121,33 +137,52 @@ export class CaseListComponent implements OnInit {
       status: formData.status ?? 'Open',
     };
 
-    this.caseService.updateCase(id, updateData).subscribe({
-      next: () => {
-        // Optimistic update: apply changes to local data immediately
-        const caseToUpdate = this.cases.find((c) => c.id === id);
+    // forkJoin waits for BOTH to complete.
+    // If the API takes 50ms, we still wait the full 1000ms.
+    // If the API takes 3000ms, we don't add any extra delay.
+    forkJoin({
+      api: this.caseService.updateCase(id, updateData),
+      delay: timer(500), // Minimum 0.5 second (use 1000 for 1 second, 2000 for 2 seconds, etc.)
+    })
+      .pipe(finalize(() => (this.isSaving = false)))
+      .subscribe({
+        next: () => {
+          this.isSaving = false;
 
-        if (caseToUpdate) {
-          caseToUpdate.caseNumber = formData.caseNumber;
-          caseToUpdate.title = formData.title;
-          caseToUpdate.assignedJudgeId = formData.assignedJudgeId ?? undefined;
-          caseToUpdate.status = formData.status ?? caseToUpdate.status;
-
-          // Look up the judge name from our local judges array
-          // so the card immediately reflects the new judge
           const selectedJudge = this.judges.find((j) => j.id === formData.assignedJudgeId);
-          if (selectedJudge) {
-            caseToUpdate.assignedJudgeName = selectedJudge.fullName;
-          }
-        }
+          const judgeName = selectedJudge ? selectedJudge.fullName : 'Unassigned';
 
-        this.closeModal();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Update failed:', err);
-        alert('Failed to update case. Please try again.');
-      },
-    });
+          const caseToUpdate = this.cases.find((c) => c.id === id);
+          if (caseToUpdate) {
+            caseToUpdate.caseNumber = formData.caseNumber;
+            caseToUpdate.title = formData.title;
+            caseToUpdate.assignedJudgeId = formData.assignedJudgeId ?? undefined;
+            caseToUpdate.status = formData.status ?? caseToUpdate.status;
+            caseToUpdate.assignedJudgeName = judgeName;
+          }
+
+          if (this.selectedCase) {
+            this.selectedCase = {
+              ...this.selectedCase,
+              caseNumber: formData.caseNumber,
+              title: formData.title,
+              assignedJudgeId: formData.assignedJudgeId ?? undefined,
+              status: formData.status ?? this.selectedCase.status,
+              assignedJudgeName: judgeName,
+            };
+          }
+
+          this.closeModal(); // Comment this line out if we want to keep the modal open after saving
+          this.toastService.success(`Case ${formData.caseNumber} updated successfully.`);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Update failed:', err);
+          this.toastService.error('Failed to update case. Please try again.');
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   closeCase(courtCase: Case): void {
@@ -161,9 +196,13 @@ export class CaseListComponent implements OnInit {
     this.caseService.updateCase(courtCase.id, updateData).subscribe({
       next: () => {
         courtCase.status = 'Closed';
+        this.toastService.success(`Case ${courtCase.caseNumber} closed.`);
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error closing case:', err),
+      error: (err) => {
+        console.error('Error closing case:', err);
+        this.toastService.error('Failed to close case. Please try again.');
+      },
     });
   }
 
@@ -177,11 +216,12 @@ export class CaseListComponent implements OnInit {
     this.caseService.deleteCase(courtCase.id).subscribe({
       next: () => {
         this.cases = this.cases.filter((c) => c.id !== courtCase.id);
+        this.toastService.success(`Case ${courtCase.caseNumber} deleted.`);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error deleting case:', err);
-        alert('Could not delete case. Check console for details.');
+        this.toastService.error('Could not delete case. Please try again.');
       },
     });
   }

@@ -10,65 +10,65 @@
       <!-- BODY -->
       <div class="modal-body">
         <form (ngSubmit)="onSubmit()" id="caseForm">
-          <div class="form-group">
-            <label for="caseNumber">Case Number</label>
-            <input
-              type="text"
-              id="caseNumber"
-              [(ngModel)]="formData.caseNumber"
-              name="caseNumber"
-              placeholder="e.g. 2024-CIV-999"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="title">Title</label>
-            <input
-              type="text"
-              id="title"
-              [(ngModel)]="formData.title"
-              name="title"
-              placeholder="e.g. State vs. Jones"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="assignedJudgeId">Assigned Judge</label>
-            <select
-              id="assignedJudgeId"
-              [(ngModel)]="formData.assignedJudgeId"
-              name="judgeId"
-              required
-            >
-              <option [ngValue]="null" disabled>-- Select a Judge --</option>
-              @for (judge of judges; track judge.id) {
-                <option [ngValue]="judge.id">{{ judge.fullName }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Status field: Only shown in Edit mode -->
-          <!-- New cases always default to "Open" on backend, so user shouldn't be able to select a status on creation. -->
-          @if (isEditMode) {
+          <fieldset [disabled]="isSaving">
             <div class="form-group">
-              <label for="status">Status</label>
-              <select id="status" [(ngModel)]="formData.status" name="status" required>
-                @for (stat of statuses; track stat) {
-                  <option [value]="stat">{{ stat }}</option>
+              <label for="caseNumber">Case Number</label>
+              <input
+                type="text"
+                id="caseNumber"
+                [(ngModel)]="formData.caseNumber"
+                name="caseNumber"
+                placeholder="e.g. 2024-CIV-999"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                [(ngModel)]="formData.title"
+                name="title"
+                placeholder="e.g. State vs. Jones"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="assignedJudgeId">Assigned Judge</label>
+              <select
+                id="assignedJudgeId"
+                [(ngModel)]="formData.assignedJudgeId"
+                name="judgeId"
+                required
+              >
+                <option [ngValue]="null" disabled>-- Select a Judge --</option>
+                @for (judge of judges; track judge.id) {
+                  <option [ngValue]="judge.id">{{ judge.fullName }}</option>
                 }
               </select>
             </div>
-          }
+
+            @if (isEditMode) {
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" [(ngModel)]="formData.status" name="status" required>
+                  @for (stat of statuses; track stat) {
+                    <option [value]="stat">{{ stat }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </fieldset>
         </form>
       </div>
 
       <!-- FOOTER -->
       <div class="modal-footer">
         <button class="btn-cancel" type="button" (click)="onClose()">Cancel</button>
-        <button class="btn-save" type="submit" form="caseForm">
-          {{ isEditMode ? 'Update Case' : 'File Case' }}
+        <button class="btn-save" type="submit" form="caseForm" [disabled]="isSubmitDisabled">
+          {{ isSaving ? 'Saving...' : isEditMode ? 'Update Case' : 'File Case' }}
         </button>
       </div>
     </div>

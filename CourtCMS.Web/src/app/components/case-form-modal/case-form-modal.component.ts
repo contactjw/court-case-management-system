@@ -18,19 +18,14 @@ export interface CaseFormData {
   styleUrl: './case-form-modal.component.scss',
 })
 export class CaseFormModalComponent implements OnChanges {
-  // --- INPUTS ---
-  // Controls whether the modal is visible
   @Input() isOpen = false;
-
+  @Input() isSaving = false;
   @Input() courtCase: Case | null = null;
-
   @Input() judges: { id: number; fullName: string }[] = [];
 
-  // --- OUTPUTS ---
   @Output() closeModal = new EventEmitter<void>();
   @Output() save = new EventEmitter<CaseFormData>();
 
-  // --- LOCAL STATE ---
   formData: CaseFormData = {
     caseNumber: '',
     title: '',
@@ -38,34 +33,62 @@ export class CaseFormModalComponent implements OnChanges {
     status: '',
   };
 
-  // Available statuses for the Edit mode dropdown
+  // Snapshot of the original values when the modal opened.
+  // We compare against this to know if the user changed anything.
+  private originalData: CaseFormData = {
+    caseNumber: '',
+    title: '',
+    assignedJudgeId: null,
+    status: '',
+  };
+
   statuses = ['Open', 'Closed', 'Suspended'];
 
   get isEditMode(): boolean {
     return this.courtCase !== null;
   }
 
-  // -- LIFECYCLE HOOKS ---
+  // Dirty tracking: compares current form values against the snapshot.
+  // Returns true if the user has changed at least one field.
+  get isDirty(): boolean {
+    return (
+      this.formData.caseNumber !== this.originalData.caseNumber ||
+      this.formData.title !== this.originalData.title ||
+      this.formData.assignedJudgeId !== this.originalData.assignedJudgeId ||
+      this.formData.status !== this.originalData.status
+    );
+  }
+
+  // The submit button should be disabled if:
+  // 1. We're in edit mode and nothing has changed (not dirty), OR
+  // 2. A save is currently in progress
+  get isSubmitDisabled(): boolean {
+    if (this.isSaving) return true;
+    if (this.isEditMode && !this.isDirty) return true;
+    return false;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['courtCase'] || changes['isOpen']) {
       if (this.isOpen && this.courtCase) {
-        // EDIT Mode: pre-fill form with existing case data
-        this.formData = {
+        const data: CaseFormData = {
           caseNumber: this.courtCase.caseNumber,
           title: this.courtCase.title,
           assignedJudgeId: this.courtCase.assignedJudgeId ?? null,
           status: this.courtCase.status,
         };
+        this.formData = { ...data };
+        // Take a snapshot so we can compare later
+        this.originalData = { ...data };
       } else if (this.isOpen && !this.courtCase) {
-        // ADD Mode: blank form
         this.resetForm();
       }
     }
   }
 
-  // -- METHODS --
   onSubmit(): void {
-    // Validate required fields
+    if (this.isSubmitDisabled) return;
+
     if (
       !this.formData.caseNumber.trim() ||
       !this.formData.title.trim() ||
@@ -74,11 +97,7 @@ export class CaseFormModalComponent implements OnChanges {
       return;
     }
 
-    // Build the emitted data
-    // Create mode excludes status (backend defaults to "Open")
-    // For EDIT Mode, we include status so the parent can decide whether to update it or not.
     const emitData: CaseFormData = { ...this.formData };
-
     if (!this.isEditMode) {
       delete emitData.status;
     }
@@ -94,13 +113,14 @@ export class CaseFormModalComponent implements OnChanges {
     event.stopPropagation();
   }
 
-  // --- PRIVATE METHODS ---
   private resetForm(): void {
-    this.formData = {
+    const blank: CaseFormData = {
       caseNumber: '',
       title: '',
       assignedJudgeId: null,
       status: '',
     };
+    this.formData = { ...blank };
+    this.originalData = { ...blank };
   }
 }
