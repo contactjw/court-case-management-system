@@ -49,13 +49,26 @@
 
     <!-- Parties Section -->
     <section class="section">
-      <h3>Parties Involved</h3>
+      <div class="section-header">
+        <h3>Parties Involved</h3>
+        <button class="btn-add" (click)="openAddPartyModal()">+ Add Party</button>
+      </div>
+
       @if (caseData.parties.length > 0) {
         <ul class="parties-list">
           @for (party of caseData.parties; track party.partyId) {
             <li>
-              <strong>{{ party.fullName }}</strong>
-              <span class="role-badge">{{ party.role }}</span>
+              <div class="party-info">
+                <strong>{{ party.fullName }}</strong>
+                <span class="role-badge">{{ party.role }}</span>
+              </div>
+              <button
+                class="btn-remove"
+                (click)="removePartyFromCase(party.partyId, party.fullName)"
+                title="Remove from case"
+              >
+                ✕
+              </button>
             </li>
           }
         </ul>
@@ -68,7 +81,7 @@
     <section class="section">
       <div class="section-header">
         <h3>Scheduled Hearings</h3>
-        <button class="btn-add-hearing" (click)="openAddHearingModal()">+ Add Hearing</button>
+        <button class="btn-add" (click)="openAddHearingModal()">+ Add Hearing</button>
       </div>
 
       @if (caseData.hearings.length > 0) {
@@ -115,15 +128,20 @@
       <button routerLink="/" class="btn-back">← Back to Case List</button>
     </div>
 
-    <!-- Hearing Form Modal -->
-    <!-- This is rendered here but HIDDEN until isModalOpen becomes true. -->
-    <!-- Notice how the parent passes data DOWN via [inputs] -->
-    <!-- and listens for events UP via (outputs) -->
+    <!-- Modals -->
     <app-hearing-form-modal
-      [isOpen]="isModalOpen"
+      [isOpen]="isHearingModalOpen"
       [hearing]="selectedHearing"
       (closeModal)="closeHearingModal()"
       (save)="onHearingSave($event)"
+    />
+
+    <app-case-party-modal
+      [isOpen]="isPartyModalOpen"
+      [availableParties]="allParties"
+      [existingParties]="caseData.parties"
+      (closeModal)="closePartyModal()"
+      (save)="onCasePartySave($event)"
     />
   }
 </div>
