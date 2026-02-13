@@ -34,6 +34,7 @@ namespace CourtCMS.Infrastructure.Data
                     Title = "City of Orange vs. Construction Co.",
                     Status = "Open",
                     FilingDate = DateTime.UtcNow.AddDays(-10),
+                    CreatedDate = DateTime.UtcNow.AddDays(-10),
                     AssignedJudge = judges[0] // Assign to Judge Judy
                 },
                 new CourtCase
@@ -42,6 +43,7 @@ namespace CourtCMS.Infrastructure.Data
                     Title = "Doe vs. Doe",
                     Status = "Closed",
                     FilingDate = DateTime.UtcNow.AddMonths(-5),
+                    CreatedDate = DateTime.UtcNow.AddMonths(-5),
                     AssignedJudge = judges[2] // Assign to Judge Marilyn
                 }
             };
@@ -50,35 +52,35 @@ namespace CourtCMS.Infrastructure.Data
             context.SaveChanges();
 
             var parties = new Party[]
-            {
-                new Party 
-                { 
-                    FirstName = "John", 
-                    LastName = "Doe", 
-                    Email = "john.doe@email.com", 
-                    Phone = "714-555-0001",
-                    CreatedDate = DateTime.UtcNow
-                },
-                new Party 
-                { 
-                    FirstName = "Jane", 
-                    LastName = "Smith", 
-                    Email = "jane.smith@email.com", 
-                    Phone = "714-555-0002",
-                    CreatedDate = DateTime.UtcNow
-                },
-                new Party 
-                { 
-                    FirstName = "ABC", 
-                    LastName = "Construction Inc.", 
-                    Email = "contact@abcconstruction.com", 
-                    Phone = "714-555-0100",
-                    CreatedDate = DateTime.UtcNow
-                }
-            };
+        {
+            new Party 
+            { 
+                FirstName = "John", 
+                LastName = "Doe", 
+                Email = "john.doe@email.com", 
+                Phone = "714-555-0001",
+                CreatedDate = DateTime.UtcNow
+            },
+            new Party 
+            { 
+                FirstName = "Jane", 
+                LastName = "Smith", 
+                Email = "jane.smith@email.com", 
+                Phone = "714-555-0002",
+                CreatedDate = DateTime.UtcNow
+            },
+            new Party 
+            { 
+                FirstName = "ABC", 
+                LastName = "Construction Inc.", 
+                Email = "contact@abcconstruction.com", 
+                Phone = "714-555-0100",
+                CreatedDate = DateTime.UtcNow
+            }
+        };
 
-            context.Parties.AddRange(parties);
-            context.SaveChanges();
+        context.Parties.AddRange(parties);
+        context.SaveChanges();
 
             // Link parties to cases
             var caseParties = new CaseParty[]
@@ -113,40 +115,40 @@ namespace CourtCMS.Infrastructure.Data
                 }
             };
 
-            context.CaseParties.AddRange(caseParties);
-            context.SaveChanges();
+        context.CaseParties.AddRange(caseParties);
+        context.SaveChanges();
 
-            // Create sample hearings
-            var hearings = new Hearing[]
-            {
-                new Hearing 
-                { 
-                    CourtCaseId = cases[0].Id,
-                    Description = "Preliminary Hearing",
-                    HearingDate = DateTime.UtcNow.AddDays(30),
-                    Location = "Courtroom 101",
-                    CreatedDate = DateTime.UtcNow
-                },
-                new Hearing 
-                { 
-                    CourtCaseId = cases[0].Id,
-                    Description = "Motion to Dismiss",
-                    HearingDate = DateTime.UtcNow.AddDays(45),
-                    Location = "Courtroom 101",
-                    CreatedDate = DateTime.UtcNow
-                },
-                new Hearing 
-                { 
-                    CourtCaseId = cases[1].Id,
-                    Description = "Final Settlement Conference",
-                    HearingDate = DateTime.UtcNow.AddDays(-60),
-                    Location = "Courtroom 303",
-                    CreatedDate = DateTime.UtcNow
-                }
-            };
+        // Create sample hearings
+        var hearings = new Hearing[]
+        {
+            new Hearing 
+            { 
+                CourtCaseId = cases[0].Id,
+                Description = "Preliminary Hearing",
+                HearingDate = DateTime.UtcNow.AddDays(30),
+                Location = "Courtroom 101",
+                CreatedDate = DateTime.UtcNow
+            },
+            new Hearing 
+            { 
+                CourtCaseId = cases[0].Id,
+                Description = "Motion to Dismiss",
+                HearingDate = DateTime.UtcNow.AddDays(45),
+                Location = "Courtroom 101",
+                CreatedDate = DateTime.UtcNow
+            },
+            new Hearing 
+            { 
+                CourtCaseId = cases[1].Id,
+                Description = "Final Settlement Conference",
+                HearingDate = DateTime.UtcNow.AddDays(-60),
+                Location = "Courtroom 303",
+                CreatedDate = DateTime.UtcNow
+            }
+        };
 
-            context.Hearings.AddRange(hearings);
-            context.SaveChanges();
+        context.Hearings.AddRange(hearings);
+        context.SaveChanges();
         }
     }
 }
