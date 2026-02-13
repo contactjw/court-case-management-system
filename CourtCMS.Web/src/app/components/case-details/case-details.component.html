@@ -141,6 +141,7 @@
       [isOpen]="isPartyModalOpen"
       [availableParties]="allParties"
       [existingParties]="caseData.parties"
+      [isSaving]="isPartySaving"
       (closeModal)="closePartyModal()"
       (save)="onCasePartySave($event)"
     />

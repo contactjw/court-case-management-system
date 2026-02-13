@@ -17,6 +17,7 @@ export interface CasePartyFormData {
 })
 export class CasePartyModalComponent implements OnChanges {
   @Input() isOpen = false;
+  @Input() isSaving = false;
 
   // All available parties to choose from (fetched by the parent)
   @Input() availableParties: Party[] = [];
@@ -49,6 +50,8 @@ export class CasePartyModalComponent implements OnChanges {
   }
 
   onSubmit(): void {
+    if (this.isSaving) return;
+
     if (!this.formData.partyId || !this.formData.role) {
       return;
     }

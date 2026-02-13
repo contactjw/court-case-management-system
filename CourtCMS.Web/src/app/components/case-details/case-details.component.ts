@@ -137,7 +137,7 @@ export class CaseDetailsComponent implements OnInit {
           this.isHearingSaving = false;
           this.caseData!.hearings.push(createdHearing);
           this.closeHearingModal();
-          this.toastService.success('Hearing added successfully.');
+          this.toastService.success(`Hearing "${createdHearing.description}" added successfully.`);
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -171,7 +171,7 @@ export class CaseDetailsComponent implements OnInit {
           }
 
           this.closeHearingModal();
-          this.toastService.success('Hearing updated successfully.');
+          this.toastService.success(`Hearing "${formData.description}" updated successfully.`);
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -240,7 +240,7 @@ export class CaseDetailsComponent implements OnInit {
           this.isPartySaving = false;
           this.caseData!.parties.push(newCaseParty);
           this.closePartyModal();
-          this.toastService.success('Party added to case.');
+          this.toastService.success(`Party "${newCaseParty.fullName}" added to case.`);
           this.cdr.detectChanges();
         },
         error: (err) => {
