@@ -1,7 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { finalize, forkJoin, timer } from 'rxjs';
 import { PartyService } from '../../services/party.service';
+import { ToastService } from '../../services/toast.service';
 import { Party } from '../../models/case.model';
 import {
   PartyFormModalComponent,
@@ -21,9 +23,11 @@ export class PartyListComponent implements OnInit {
   // --- MODAL STATE ---
   isModalOpen = false;
   selectedParty: Party | null = null;
+  isSaving = false;
 
   constructor(
     private partyService: PartyService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -47,22 +51,29 @@ export class PartyListComponent implements OnInit {
 
   openCreateModal(): void {
     this.selectedParty = null;
+    this.isSaving = false;
     this.isModalOpen = true;
   }
 
   openEditModal(party: Party): void {
     this.selectedParty = party;
+    this.isSaving = false;
     this.isModalOpen = true;
   }
 
   closeModal(): void {
     this.isModalOpen = false;
     this.selectedParty = null;
+    this.isSaving = false;
   }
 
   // --- CRUD OPERATIONS ---
 
   onPartySave(formData: PartyFormData): void {
+    if (this.isSaving) return;
+    this.isSaving = true;
+    this.cdr.detectChanges();
+
     if (this.selectedParty) {
       this.updateParty(this.selectedParty.id, formData);
     } else {
@@ -71,41 +82,61 @@ export class PartyListComponent implements OnInit {
   }
 
   private createParty(formData: PartyFormData): void {
-    this.partyService.createParty(formData).subscribe({
-      next: (createdParty) => {
-        this.parties.push(createdParty);
-        this.sortParties();
-        this.closeModal();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error creating party:', err);
-        alert('Failed to create party. Please try again.');
-      },
-    });
+    forkJoin({
+      api: this.partyService.createParty(formData),
+      delay: timer(500), // Minimum 0.5 second (use 1000 for 1 second, 2000 for 2 seconds, etc.)
+    })
+      .pipe(finalize(() => (this.isSaving = false)))
+      .subscribe({
+        next: ({ api: createdParty }) => {
+          this.isSaving = false;
+          this.parties.push(createdParty);
+          this.sortParties();
+          this.closeModal();
+          this.toastService.success(`${createdParty.firstName} ${createdParty.lastName} added.`);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Error creating party:', err);
+          this.toastService.error('Failed to create party. Please try again.');
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   private updateParty(id: number, formData: PartyFormData): void {
-    this.partyService.updateParty(id, formData).subscribe({
-      next: () => {
-        const partyToUpdate = this.parties.find((p) => p.id === id);
+    forkJoin({
+      api: this.partyService.updateParty(id, formData),
+      delay: timer(500), // Minimum 0.5 second (use 1000 for 1 second, 2000 for 2 seconds, etc.)
+    })
+      .pipe(finalize(() => (this.isSaving = false)))
+      .subscribe({
+        next: () => {
+          this.isSaving = false;
 
-        if (partyToUpdate) {
-          partyToUpdate.firstName = formData.firstName;
-          partyToUpdate.lastName = formData.lastName;
-          partyToUpdate.email = formData.email;
-          partyToUpdate.phone = formData.phone;
-        }
+          const partyToUpdate = this.parties.find((p) => p.id === id);
+          if (partyToUpdate) {
+            partyToUpdate.firstName = formData.firstName;
+            partyToUpdate.lastName = formData.lastName;
+            partyToUpdate.email = formData.email;
+            partyToUpdate.phone = formData.phone;
+          }
 
-        this.sortParties();
-        this.closeModal();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error updating party:', err);
-        alert('Failed to update party. Please try again.');
-      },
-    });
+          this.sortParties();
+          this.closeModal();
+          this.toastService.success(
+            `${formData.firstName} ${formData.lastName} updated successfully.`,
+          );
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Error updating party:', err);
+          this.toastService.error('Failed to update party. Please try again.');
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   deleteParty(party: Party): void {
@@ -118,19 +149,17 @@ export class PartyListComponent implements OnInit {
     this.partyService.deleteParty(party.id).subscribe({
       next: () => {
         this.parties = this.parties.filter((p) => p.id !== party.id);
+        this.toastService.success(`${party.firstName} ${party.lastName} deleted.`);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error deleting party:', err);
-        alert('Could not delete party. Check console for details.');
+        this.toastService.error('Failed to delete party. Please try again.');
       },
     });
   }
 
   private sortParties(): void {
-    this.parties.sort((a, b) => {
-      const lastNameCompare = a.lastName.localeCompare(b.lastName);
-      return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
-    });
+    this.parties.sort((a, b) => a.lastName.localeCompare(b.lastName));
   }
 }

@@ -60,7 +60,6 @@ $danger-red: #dc3545;
   padding: 1.5rem;
 }
 
-// Side-by-side fields (First Name + Last Name)
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -140,6 +139,24 @@ $danger-red: #dc3545;
     background-color: darken($accent-blue, 8%);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
   }
 }
 

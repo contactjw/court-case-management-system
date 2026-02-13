@@ -19,6 +19,7 @@ export interface PartyFormData {
 })
 export class PartyFormModalComponent implements OnChanges {
   @Input() isOpen = false;
+  @Input() isSaving = false;
   @Input() party: Party | null = null;
 
   @Output() closeModal = new EventEmitter<void>();
@@ -31,19 +32,43 @@ export class PartyFormModalComponent implements OnChanges {
     phone: '',
   };
 
+  private originalData: PartyFormData = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  };
+
   get isEditMode(): boolean {
     return this.party !== null;
+  }
+
+  get isDirty(): boolean {
+    return (
+      this.formData.firstName !== this.originalData.firstName ||
+      this.formData.lastName !== this.originalData.lastName ||
+      this.formData.email !== this.originalData.email ||
+      this.formData.phone !== this.originalData.phone
+    );
+  }
+
+  get isSubmitDisabled(): boolean {
+    if (this.isSaving) return true;
+    if (this.isEditMode && !this.isDirty) return true;
+    return false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['party'] || changes['isOpen']) {
       if (this.isOpen && this.party) {
-        this.formData = {
+        const data: PartyFormData = {
           firstName: this.party.firstName,
           lastName: this.party.lastName,
           email: this.party.email,
           phone: this.party.phone,
         };
+        this.formData = { ...data };
+        this.originalData = { ...data };
       } else if (this.isOpen && !this.party) {
         this.resetForm();
       }
@@ -51,6 +76,8 @@ export class PartyFormModalComponent implements OnChanges {
   }
 
   onSubmit(): void {
+    if (this.isSubmitDisabled) return;
+
     if (
       !this.formData.firstName.trim() ||
       !this.formData.lastName.trim() ||
@@ -72,11 +99,13 @@ export class PartyFormModalComponent implements OnChanges {
   }
 
   private resetForm(): void {
-    this.formData = {
+    const blank: PartyFormData = {
       firstName: '',
       lastName: '',
       email: '',
       phone: '',
     };
+    this.formData = { ...blank };
+    this.originalData = { ...blank };
   }
 }

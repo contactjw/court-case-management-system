@@ -26,10 +26,6 @@
   </div>
 
   <!-- PARTY TABLE -->
-  <!-- Tables are better than cards for party data because parties
-       have uniform fields (name, email, phone). Cards work well when
-       each item has variable content (like cases with different statuses
-       and actions). Tables excel at scannable, uniform data. -->
   <div class="table-container">
     <table>
       <thead>
@@ -72,6 +68,7 @@
 <app-party-form-modal
   [isOpen]="isModalOpen"
   [party]="selectedParty"
+  [isSaving]="isSaving"
   (closeModal)="closeModal()"
   (save)="onPartySave($event)"
 />
