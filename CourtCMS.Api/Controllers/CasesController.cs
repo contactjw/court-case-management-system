@@ -79,7 +79,9 @@ namespace CourtCMS.Api.Controllers
             }).ToList(),
             
             // Map hearings
-            Hearings = courtCase.Hearings.Select(h => new HearingDto
+            Hearings = courtCase.Hearings
+                .OrderBy(h => h.HearingDate)
+                .Select(h => new HearingDto
             {
                 Id = h.Id,
                 Description = h.Description,

@@ -136,6 +136,7 @@ export class CaseDetailsComponent implements OnInit {
         next: ({ api: createdHearing }) => {
           this.isHearingSaving = false;
           this.caseData!.hearings.push(createdHearing);
+          this.sortHearings();
           this.closeHearingModal();
           this.toastService.success(`Hearing "${createdHearing.description}" added successfully.`);
           this.cdr.detectChanges();
@@ -170,6 +171,7 @@ export class CaseDetailsComponent implements OnInit {
             };
           }
 
+          this.sortHearings();
           this.closeHearingModal();
           this.toastService.success(`Hearing "${formData.description}" updated successfully.`);
           this.cdr.detectChanges();
@@ -272,5 +274,11 @@ export class CaseDetailsComponent implements OnInit {
         this.toastService.error('Failed to remove party. Please try again.');
       },
     });
+  }
+
+  private sortHearings(): void {
+    this.caseData!.hearings.sort(
+      (a, b) => new Date(a.hearingDate).getTime() - new Date(b.hearingDate).getTime(),
+    );
   }
 }
