@@ -14,9 +14,7 @@ $danger-red: #dc3545;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; // Ensures the modal sits above everything else
-
-  // Smooth fade-in animation
+  z-index: 1000;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -27,8 +25,6 @@ $danger-red: #dc3545;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
-  // Subtle slide-up animation for a polished feel
   animation: slideUp 0.25s ease-out;
 }
 
@@ -77,21 +73,19 @@ $danger-red: #dc3545;
 
   input {
     width: 100%;
-    box-sizing: border-box; // ← FIX: Include padding inside the width
+    box-sizing: border-box;
     padding: 0.6rem 0.75rem;
     border: 1px solid $border-color;
     border-radius: 4px;
     font-size: 1rem;
     transition: border-color 0.2s;
 
-    // Highlight the field when the user clicks into it
     &:focus {
       outline: none;
       border-color: $court-blue;
       box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.15);
     }
 
-    // Style for placeholder text
     &::placeholder {
       color: #adb5bd;
     }
@@ -139,9 +133,28 @@ $danger-red: #dc3545;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
+
+  &:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 }
 
-// --- ANIMATIONS ---
+// Native fieldset reset — removes default browser chrome
+// while letting us use its [disabled] behavior to gray out the form
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

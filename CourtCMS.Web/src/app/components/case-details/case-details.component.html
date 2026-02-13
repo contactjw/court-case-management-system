@@ -132,6 +132,7 @@
     <app-hearing-form-modal
       [isOpen]="isHearingModalOpen"
       [hearing]="selectedHearing"
+      [isSaving]="isHearingSaving"
       (closeModal)="closeHearingModal()"
       (save)="onHearingSave($event)"
     />

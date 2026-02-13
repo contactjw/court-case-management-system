@@ -18,9 +18,8 @@ export interface HearingFormData {
 })
 export class HearingFormModalComponent implements OnChanges {
   // --- INPUTS ---
-  // Controls whether the modal is visible
   @Input() isOpen = false;
-
+  @Input() isSaving = false;
   @Input() hearing: Hearing | null = null;
 
   // --- OUTPUTS ---
@@ -33,27 +32,52 @@ export class HearingFormModalComponent implements OnChanges {
     location: '',
   };
 
+  // Snapshot of original values — used for dirty tracking
+  private originalData: HearingFormData = {
+    description: '',
+    hearingDate: '',
+    location: '',
+  };
+
   get isEditMode(): boolean {
     return this.hearing !== null;
+  }
+
+  // Returns true if the user has changed at least one field
+  get isDirty(): boolean {
+    return (
+      this.formData.description !== this.originalData.description ||
+      this.formData.hearingDate !== this.originalData.hearingDate ||
+      this.formData.location !== this.originalData.location
+    );
+  }
+
+  // Button disabled if saving, or in edit mode with no changes
+  get isSubmitDisabled(): boolean {
+    if (this.isSaving) return true;
+    if (this.isEditMode && !this.isDirty) return true;
+    return false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['hearing'] || changes['isOpen']) {
       if (this.isOpen && this.hearing) {
-        this.formData = {
+        const data: HearingFormData = {
           description: this.hearing.description,
           hearingDate: this.formatDateForInput(this.hearing.hearingDate),
           location: this.hearing.location,
         };
+        this.formData = { ...data };
+        this.originalData = { ...data };
       } else if (this.isOpen && !this.hearing) {
-        // ADD MODE - reset form
         this.resetForm();
       }
     }
   }
 
-  // Called when the user submits the form
   onSubmit(): void {
+    if (this.isSubmitDisabled) return;
+
     if (
       !this.formData.description.trim() ||
       !this.formData.hearingDate ||
@@ -73,11 +97,13 @@ export class HearingFormModalComponent implements OnChanges {
   }
 
   private resetForm(): void {
-    this.formData = {
+    const blank: HearingFormData = {
       description: '',
       hearingDate: '',
       location: '',
     };
+    this.formData = { ...blank };
+    this.originalData = { ...blank };
   }
 
   private formatDateForInput(dateString: string): string {

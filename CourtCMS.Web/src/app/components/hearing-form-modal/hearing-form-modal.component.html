@@ -12,48 +12,50 @@
       <!-- BODY -->
       <div class="modal-body">
         <form (ngSubmit)="onSubmit()" id="hearingForm">
-          <div class="form-group">
-            <label for="description">Description</label>
-            <input
-              type="text"
-              id="description"
-              [(ngModel)]="formData.description"
-              name="description"
-              placeholder="e.g. Preliminary Hearing"
-              required
-            />
-          </div>
+          <fieldset [disabled]="isSaving">
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input
+                type="text"
+                id="description"
+                [(ngModel)]="formData.description"
+                name="description"
+                placeholder="e.g. Preliminary Hearing"
+                required
+              />
+            </div>
 
-          <div class="form-group">
-            <label for="hearingDate">Hearing Date & Time</label>
-            <input
-              type="datetime-local"
-              id="hearingDate"
-              [(ngModel)]="formData.hearingDate"
-              name="hearingDate"
-              required
-            />
-          </div>
+            <div class="form-group">
+              <label for="hearingDate">Hearing Date & Time</label>
+              <input
+                type="datetime-local"
+                id="hearingDate"
+                [(ngModel)]="formData.hearingDate"
+                name="hearingDate"
+                required
+              />
+            </div>
 
-          <div class="form-group">
-            <label for="location">Location</label>
-            <input
-              type="text"
-              id="location"
-              [(ngModel)]="formData.location"
-              name="location"
-              placeholder="e.g. Courtroom 101"
-              required
-            />
-          </div>
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input
+                type="text"
+                id="location"
+                [(ngModel)]="formData.location"
+                name="location"
+                placeholder="e.g. Courtroom 101"
+                required
+              />
+            </div>
+          </fieldset>
         </form>
       </div>
 
       <!-- FOOTER -->
       <div class="modal-footer">
         <button class="btn-cancel" type="button" (click)="onClose()">Cancel</button>
-        <button class="btn-save" type="submit" form="hearingForm">
-          {{ isEditMode ? 'Update Hearing' : 'Add Hearing' }}
+        <button class="btn-save" type="submit" form="hearingForm" [disabled]="isSubmitDisabled">
+          {{ isSaving ? 'Saving...' : isEditMode ? 'Update Hearing' : 'Add Hearing' }}
         </button>
       </div>
     </div>
