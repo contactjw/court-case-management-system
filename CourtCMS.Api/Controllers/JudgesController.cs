@@ -25,6 +25,7 @@ namespace CourtCMS.Api.Controllers
             var judges = await _context.Judges
             .Where(j => j.IsActive)
             .OrderBy(j => j.LastName)
+            .ThenBy(j => j.FirstName)
             .Select(j => new
             {
                 Id = j.Id,
