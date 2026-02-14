@@ -234,13 +234,14 @@ export class CaseDetailsComponent implements OnInit {
         partyId: formData.partyId,
         role: formData.role,
       }),
-      delay: timer(1000),
+      delay: timer(500), // Minimum 0.5 second (use 1000 for 1 second, 2000 for 2 seconds, etc.)
     })
       .pipe(finalize(() => (this.isPartySaving = false)))
       .subscribe({
         next: ({ api: newCaseParty }) => {
           this.isPartySaving = false;
           this.caseData!.parties.push(newCaseParty);
+          this.caseData!.parties.sort((a, b) => a.fullName.localeCompare(b.fullName));
           this.closePartyModal();
           this.toastService.success(`Party "${newCaseParty.fullName}" added to case.`);
           this.cdr.detectChanges();
