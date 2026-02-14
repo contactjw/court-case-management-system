@@ -1,0 +1,21 @@
+<nav class="top-nav">
+  <div class="nav-content">
+    <a routerLink="/" class="nav-brand">
+      <span class="brand-icon">⚖</span>
+      <div>
+        <h1>CourtCMS</h1>
+        <p>Lemon County Superior Court</p>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+        >Cases</a
+      >
+      <a routerLink="/parties" routerLinkActive="active" class="nav-link">Parties</a>
+    </div>
+  </div>
+</nav>

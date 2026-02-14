@@ -6,11 +6,12 @@ import { CaseService } from '../../services/case.service';
 import { ToastService } from '../../services/toast.service';
 import { Case } from '../../models/case.model';
 import { CaseFormModalComponent, CaseFormData } from '../case-form-modal/case-form-modal.component';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-case-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, CaseFormModalComponent],
+  imports: [CommonModule, RouterModule, CaseFormModalComponent, NavbarComponent],
   templateUrl: './case-list.component.html',
   styleUrl: './case-list.component.scss',
 })

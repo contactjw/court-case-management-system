@@ -9,11 +9,12 @@ import {
   PartyFormModalComponent,
   PartyFormData,
 } from '../party-form-modal/party-form-modal.component';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-party-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, PartyFormModalComponent],
+  imports: [CommonModule, RouterModule, PartyFormModalComponent, NavbarComponent],
   templateUrl: './party-list.component.html',
   styleUrl: './party-list.component.scss',
 })
@@ -160,6 +161,12 @@ export class PartyListComponent implements OnInit {
   }
 
   private sortParties(): void {
-    this.parties.sort((a, b) => a.lastName.localeCompare(b.lastName));
+    this.parties.sort((a, b) => {
+      const lastNameComparison = a.lastName.localeCompare(b.lastName);
+      if (lastNameComparison !== 0) {
+        return lastNameComparison;
+      }
+      return a.firstName.localeCompare(b.firstName);
+    });
   }
 }
