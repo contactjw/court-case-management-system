@@ -7,57 +7,99 @@
       </div>
 
       <div class="modal-body">
-        <form (ngSubmit)="onSubmit()" id="partyForm">
+        <form [formGroup]="partyForm" (ngSubmit)="onSubmit()" id="partyForm">
           <fieldset [disabled]="isSaving">
             <!-- Name fields side by side -->
             <div class="form-row">
+              <!-- FIRST NAME -->
               <div class="form-group">
                 <label for="firstName">First Name</label>
                 <input
                   type="text"
                   id="firstName"
-                  [(ngModel)]="formData.firstName"
-                  name="firstName"
+                  formControlName="firstName"
                   placeholder="e.g. John"
-                  required
+                  [class.invalid]="showError('firstName')"
                 />
+
+                @if (showError('firstName')) {
+                  <span class="error-message">
+                    @if (partyForm.get('firstName')?.errors?.['required']) {
+                      First name is required.
+                    } @else if (partyForm.get('firstName')?.errors?.['minlength']) {
+                      Must be at least 2 characters.
+                    }
+                  </span>
+                }
               </div>
 
+              <!-- LAST NAME -->
               <div class="form-group">
                 <label for="lastName">Last Name</label>
                 <input
                   type="text"
                   id="lastName"
-                  [(ngModel)]="formData.lastName"
-                  name="lastName"
+                  formControlName="lastName"
                   placeholder="e.g. Doe"
-                  required
+                  [class.invalid]="showError('lastName')"
                 />
+
+                @if (showError('lastName')) {
+                  <span class="error-message">
+                    @if (partyForm.get('lastName')?.errors?.['required']) {
+                      Last name is required.
+                    } @else if (partyForm.get('lastName')?.errors?.['minlength']) {
+                      Must be at least 2 characters.
+                    }
+                  </span>
+                }
               </div>
             </div>
 
+            <!-- EMAIL -->
             <div class="form-group">
               <label for="email">Email</label>
               <input
                 type="email"
                 id="email"
-                [(ngModel)]="formData.email"
-                name="email"
+                formControlName="email"
                 placeholder="e.g. john.doe@email.com"
-                required
+                [class.invalid]="showError('email')"
               />
+              @if (showError('email')) {
+                <span class="error-message">
+                  @if (partyForm.get('email')?.errors?.['required']) {
+                    Email is required.
+                  } @else if (partyForm.get('email')?.errors?.['pattern']) {
+                    Enter a valid email address (e.g. john.doe&#64;email.com).
+                  }
+                </span>
+              }
             </div>
 
+            <!-- PHONE -->
             <div class="form-group">
               <label for="phone">Phone</label>
               <input
                 type="tel"
                 id="phone"
-                [(ngModel)]="formData.phone"
-                name="phone"
+                formControlName="phone"
                 placeholder="e.g. 714-555-0001"
-                required
+                [class.invalid]="showError('phone')"
               />
+              @if (showError('phone')) {
+                <span class="error-message">
+                  @if (partyForm.get('phone')?.errors?.['required']) {
+                    Phone number is required.
+                  } @else if (partyForm.get('phone')?.errors?.['minlength']) {
+                    Must be at least 7 characters.
+                  } @else if (partyForm.get('phone')?.errors?.['maxlength']) {
+                    Cannot exceed 16 characters.
+                  } @else if (partyForm.get('phone')?.errors?.['pattern']) {
+                    Only digits, spaces, dashes, dots, and parentheses allowed.
+                  }
+                </span>
+              }
             </div>
           </fieldset>
         </form>
