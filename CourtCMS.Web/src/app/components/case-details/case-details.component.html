@@ -18,7 +18,11 @@
   @else if (caseData) {
     <div class="details-header">
       <h1>{{ caseData.caseNumber }}</h1>
-      <span class="status-badge" [class.closed]="caseData.status === 'Closed'">
+      <span
+        class="status-badge"
+        [class.closed]="caseData.status === 'Closed'"
+        [class.suspended]="caseData.status === 'Suspended'"
+      >
         {{ caseData.status }}
       </span>
     </div>

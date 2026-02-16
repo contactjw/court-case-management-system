@@ -61,6 +61,11 @@ $danger-red: #dc3545;
   &.closed {
     background-color: $gray;
   }
+
+  &.suspended {
+    background-color: #ffc107;
+    color: white;
+  }
 }
 
 h2 {
