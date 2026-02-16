@@ -29,13 +29,6 @@ export class PartyFormModalComponent implements OnChanges {
 
   submitted = false;
 
-  // formData: PartyFormData = {
-  //   firstName: '',
-  //   lastName: '',
-  //   email: '',
-  //   phone: '',
-  // };
-
   private originalData: PartyFormData = {
     firstName: '',
     lastName: '',
