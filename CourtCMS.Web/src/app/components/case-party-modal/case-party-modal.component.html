@@ -13,11 +13,16 @@
             <p class="hint">You can add new parties from the Party Directory.</p>
           </div>
         } @else {
-          <form (ngSubmit)="onSubmit()" id="casePartyForm">
+          <form [formGroup]="casePartyForm" (ngSubmit)="onSubmit()" id="casePartyForm">
             <fieldset [disabled]="isSaving">
+              <!-- SELECT PARTY -->
               <div class="form-group">
                 <label for="partyId">Select Party</label>
-                <select id="partyId" [(ngModel)]="formData.partyId" name="partyId" required>
+                <select
+                  id="partyId"
+                  formControlName="partyId"
+                  [class.invalid]="showError('partyId')"
+                >
                   <option [ngValue]="null" disabled>-- Select a Party --</option>
                   @for (party of filteredParties; track party.id) {
                     <option [ngValue]="party.id">
@@ -25,16 +30,23 @@
                     </option>
                   }
                 </select>
+                @if (showError('partyId')) {
+                  <span class="error-message">Please select a party.</span>
+                }
               </div>
 
+              <!-- ROLE IN CASE -->
               <div class="form-group">
                 <label for="role">Role in Case</label>
-                <select id="role" [(ngModel)]="formData.role" name="role" required>
+                <select id="role" formControlName="role" [class.invalid]="showError('role')">
                   <option value="" disabled>-- Select a Role --</option>
                   @for (role of roles; track role) {
                     <option [value]="role">{{ role }}</option>
                   }
                 </select>
+                @if (showError('role')) {
+                  <span class="error-message">Please select a role.</span>
+                }
               </div>
             </fieldset>
           </form>
