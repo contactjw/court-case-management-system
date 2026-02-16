@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Case } from '../../models/case.model';
 
 export interface CaseFormData {
@@ -13,7 +13,7 @@ export interface CaseFormData {
 @Component({
   selector: 'app-case-form-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './case-form-modal.component.html',
   styleUrl: './case-form-modal.component.scss',
 })
@@ -26,12 +26,9 @@ export class CaseFormModalComponent implements OnChanges {
   @Output() closeModal = new EventEmitter<void>();
   @Output() save = new EventEmitter<CaseFormData>();
 
-  formData: CaseFormData = {
-    caseNumber: '',
-    title: '',
-    assignedJudgeId: null,
-    status: '',
-  };
+  caseForm: FormGroup;
+  submitted = false;
+  statuses = ['Open', 'Closed', 'Suspended'];
 
   // Snapshot of the original values when the modal opened.
   // We compare against this to know if the user changed anything.
@@ -42,7 +39,27 @@ export class CaseFormModalComponent implements OnChanges {
     status: '',
   };
 
-  statuses = ['Open', 'Closed', 'Suspended'];
+  constructor(private fb: FormBuilder) {
+    this.caseForm = this.createForm();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      // Case number: required, must follow court format like "2024-CIV-001"
+      // Pattern breakdown: 4 digits, dash, 2-4 uppercase letters, dash, 1-4 digits
+      caseNumber: ['', [Validators.required, Validators.pattern(/^\d{4}-[A-Z]{2,4}-\d{1,4}$/)]],
+
+      title: ['', [Validators.required, Validators.minLength(5)]],
+
+      // Judge dropdown: required, Validators.required works on selects too.
+      // When nothing is selected, the value is null, which fails required.
+      assignedJudgeId: [null, [Validators.required]],
+
+      // Status is NOT included here by default.
+      // It gets dynamically added in ngOnChanges when we're in edit mode.
+      // This is cleaner than always having it and ignoring it in create mode.
+    });
+  }
 
   get isEditMode(): boolean {
     return this.courtCase !== null;
@@ -51,11 +68,15 @@ export class CaseFormModalComponent implements OnChanges {
   // Dirty tracking: compares current form values against the snapshot.
   // Returns true if the user has changed at least one field.
   get isDirty(): boolean {
+    if (!this.isEditMode) return true;
+
+    const current = this.caseForm.value;
+
     return (
-      this.formData.caseNumber !== this.originalData.caseNumber ||
-      this.formData.title !== this.originalData.title ||
-      this.formData.assignedJudgeId !== this.originalData.assignedJudgeId ||
-      this.formData.status !== this.originalData.status
+      current.caseNumber !== this.originalData.caseNumber ||
+      current.title !== this.originalData.title ||
+      current.assignedJudgeId !== this.originalData.assignedJudgeId ||
+      current.status !== this.originalData.status
     );
   }
 
@@ -68,41 +89,46 @@ export class CaseFormModalComponent implements OnChanges {
     return false;
   }
 
+  showError(fieldName: string): boolean {
+    const control = this.caseForm.get(fieldName);
+    if (!control) return false;
+    return control.invalid && (control.dirty || control.touched || this.submitted);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['courtCase'] || changes['isOpen']) {
       if (this.isOpen && this.courtCase) {
+        if (!this.caseForm.get('status')) {
+          this.caseForm.addControl('status', this.fb.control('', [Validators.required]));
+        }
+
         const data: CaseFormData = {
           caseNumber: this.courtCase.caseNumber,
           title: this.courtCase.title,
           assignedJudgeId: this.courtCase.assignedJudgeId ?? null,
           status: this.courtCase.status,
         };
-        this.formData = { ...data };
+        this.caseForm.reset(data);
         // Take a snapshot so we can compare later
         this.originalData = { ...data };
+        this.submitted = false;
       } else if (this.isOpen && !this.courtCase) {
+        if (this.caseForm.get('status')) {
+          this.caseForm.removeControl('status');
+        }
+
         this.resetForm();
       }
     }
   }
 
   onSubmit(): void {
+    this.submitted = true;
+
     if (this.isSubmitDisabled) return;
+    if (this.caseForm.invalid) return;
 
-    if (
-      !this.formData.caseNumber.trim() ||
-      !this.formData.title.trim() ||
-      !this.formData.assignedJudgeId
-    ) {
-      return;
-    }
-
-    const emitData: CaseFormData = { ...this.formData };
-    if (!this.isEditMode) {
-      delete emitData.status;
-    }
-
-    this.save.emit(emitData);
+    this.save.emit(this.caseForm.value as CaseFormData);
   }
 
   onClose(): void {
@@ -118,9 +144,8 @@ export class CaseFormModalComponent implements OnChanges {
       caseNumber: '',
       title: '',
       assignedJudgeId: null,
-      status: '',
     };
-    this.formData = { ...blank };
-    this.originalData = { ...blank };
+    this.originalData = { caseNumber: '', title: '', assignedJudgeId: null, status: '' };
+    this.submitted = false;
   }
 }

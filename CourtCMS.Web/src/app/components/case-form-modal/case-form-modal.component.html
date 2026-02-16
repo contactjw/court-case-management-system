@@ -9,55 +9,79 @@
 
       <!-- BODY -->
       <div class="modal-body">
-        <form (ngSubmit)="onSubmit()" id="caseForm">
+        <form [formGroup]="caseForm" (ngSubmit)="onSubmit()" id="caseForm">
           <fieldset [disabled]="isSaving">
+            <!-- CASE NUMBER -->
             <div class="form-group">
               <label for="caseNumber">Case Number</label>
               <input
                 type="text"
                 id="caseNumber"
-                [(ngModel)]="formData.caseNumber"
-                name="caseNumber"
+                formControlName="caseNumber"
                 placeholder="e.g. 2024-CIV-999"
-                required
+                [class.invalid]="showError('caseNumber')"
               />
+              @if (showError('caseNumber')) {
+                <span class="error-message">
+                  @if (caseForm.get('caseNumber')?.errors?.['required']) {
+                    Case number is required.
+                  } @else if (caseForm.get('caseNumber')?.errors?.['pattern']) {
+                    Must follow format: YYYY-TYPE-### (e.g. 2024-CIV-001).
+                  }
+                </span>
+              }
             </div>
 
+            <!-- TITLE -->
             <div class="form-group">
               <label for="title">Title</label>
               <input
                 type="text"
                 id="title"
-                [(ngModel)]="formData.title"
-                name="title"
+                formControlName="title"
                 placeholder="e.g. State vs. Jones"
-                required
+                [class.invalid]="showError('title')"
               />
+              @if (showError('title')) {
+                <span class="error-message">
+                  @if (caseForm.get('title')?.errors?.['required']) {
+                    Case title is required.
+                  } @else if (caseForm.get('title')?.errors?.['minlength']) {
+                    Case title must be at least 5 characters long.
+                  }
+                </span>
+              }
             </div>
 
+            <!-- ASSIGNED JUDGE -->
             <div class="form-group">
               <label for="assignedJudgeId">Assigned Judge</label>
               <select
                 id="assignedJudgeId"
-                [(ngModel)]="formData.assignedJudgeId"
-                name="judgeId"
-                required
+                formControlName="assignedJudgeId"
+                [class.invalid]="showError('assignedJudgeId')"
               >
                 <option [ngValue]="null" disabled>-- Select a Judge --</option>
                 @for (judge of judges; track judge.id) {
                   <option [ngValue]="judge.id">{{ judge.fullName }}</option>
                 }
               </select>
+              @if (showError('assignedJudgeId')) {
+                <span class="error-message">A judge must be assigned to this case.</span>
+              }
             </div>
 
-            @if (isEditMode) {
+            @if (caseForm.get('status')) {
               <div class="form-group">
                 <label for="status">Status</label>
-                <select id="status" [(ngModel)]="formData.status" name="status" required>
+                <select id="status" formControlName="status" [class.invalid]="showError('status')">
                   @for (stat of statuses; track stat) {
                     <option [value]="stat">{{ stat }}</option>
                   }
                 </select>
+                @if (showError('status')) {
+                  <span class="error-message">Status is required.</span>
+                }
               </div>
             }
           </fieldset>
