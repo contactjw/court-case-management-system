@@ -11,41 +11,66 @@
 
       <!-- BODY -->
       <div class="modal-body">
-        <form (ngSubmit)="onSubmit()" id="hearingForm">
+        <form [formGroup]="hearingForm" (ngSubmit)="onSubmit()" id="hearingForm">
           <fieldset [disabled]="isSaving">
+            <!-- DESCRIPTION -->
             <div class="form-group">
               <label for="description">Description</label>
               <input
                 type="text"
                 id="description"
-                [(ngModel)]="formData.description"
-                name="description"
+                formControlName="description"
                 placeholder="e.g. Preliminary Hearing"
-                required
+                [class.invalid]="showError('description')"
               />
+              @if (showError('description')) {
+                <span class="error-message">
+                  @if (hearingForm.get('description')?.errors?.['required']) {
+                    Description is required.
+                  } @else if (hearingForm.get('description')?.errors?.['minlength']) {
+                    Must be at least 3 characters.
+                  }
+                </span>
+              }
             </div>
 
+            <!-- HEARING DATE & TIME -->
             <div class="form-group">
               <label for="hearingDate">Hearing Date & Time</label>
               <input
                 type="datetime-local"
                 id="hearingDate"
-                [(ngModel)]="formData.hearingDate"
-                name="hearingDate"
-                required
+                formControlName="hearingDate"
+                [class.invalid]="showError('hearingDate')"
               />
+              @if (showError('hearingDate')) {
+                <span class="error-message">
+                  @if (hearingForm.get('hearingDate')?.errors?.['required']) {
+                    A hearing date and time is required.
+                  }
+                </span>
+              }
             </div>
 
+            <!-- LOCATION -->
             <div class="form-group">
               <label for="location">Location</label>
               <input
                 type="text"
                 id="location"
-                [(ngModel)]="formData.location"
-                name="location"
+                formControlName="location"
                 placeholder="e.g. Courtroom 101"
-                required
+                [class.invalid]="showError('location')"
               />
+              @if (showError('location')) {
+                <span class="error-message">
+                  @if (hearingForm.get('location')?.errors?.['required']) {
+                    Location is required.
+                  } @else if (hearingForm.get('location')?.errors?.['minlength']) {
+                    Must be at least 3 characters.
+                  }
+                </span>
+              }
             </div>
           </fieldset>
         </form>

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Hearing } from '../../models/case.model';
 
 export interface HearingFormData {
@@ -12,7 +12,7 @@ export interface HearingFormData {
 @Component({
   selector: 'app-hearing-form-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './hearing-form-modal.component.html',
   styleUrl: './hearing-form-modal.component.scss',
 })
@@ -26,11 +26,8 @@ export class HearingFormModalComponent implements OnChanges {
   @Output() closeModal = new EventEmitter<void>();
   @Output() save = new EventEmitter<HearingFormData>();
 
-  formData: HearingFormData = {
-    description: '',
-    hearingDate: '',
-    location: '',
-  };
+  hearingForm: FormGroup;
+  submitted = false;
 
   // Snapshot of original values — used for dirty tracking
   private originalData: HearingFormData = {
@@ -39,16 +36,33 @@ export class HearingFormModalComponent implements OnChanges {
     location: '',
   };
 
+  constructor(private fb: FormBuilder) {
+    this.hearingForm = this.createForm();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      description: ['', [Validators.required, Validators.minLength(3)]],
+
+      hearingDate: ['', [Validators.required]],
+
+      location: ['', [Validators.required, Validators.minLength(3)]],
+    });
+  }
+
   get isEditMode(): boolean {
     return this.hearing !== null;
   }
 
   // Returns true if the user has changed at least one field
   get isDirty(): boolean {
+    if (!this.isEditMode) return true;
+
+    const current = this.hearingForm.value;
     return (
-      this.formData.description !== this.originalData.description ||
-      this.formData.hearingDate !== this.originalData.hearingDate ||
-      this.formData.location !== this.originalData.location
+      current.description !== this.originalData.description ||
+      current.hearingDate !== this.originalData.hearingDate ||
+      current.location !== this.originalData.location
     );
   }
 
@@ -59,6 +73,12 @@ export class HearingFormModalComponent implements OnChanges {
     return false;
   }
 
+  showError(fieldName: string): boolean {
+    const control = this.hearingForm.get(fieldName);
+    if (!control) return false;
+    return control.invalid && (control.dirty || control.touched || this.submitted);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['hearing'] || changes['isOpen']) {
       if (this.isOpen && this.hearing) {
@@ -67,8 +87,9 @@ export class HearingFormModalComponent implements OnChanges {
           hearingDate: this.formatDateForInput(this.hearing.hearingDate),
           location: this.hearing.location,
         };
-        this.formData = { ...data };
+        this.hearingForm.reset(data);
         this.originalData = { ...data };
+        this.submitted = false;
       } else if (this.isOpen && !this.hearing) {
         this.resetForm();
       }
@@ -76,16 +97,12 @@ export class HearingFormModalComponent implements OnChanges {
   }
 
   onSubmit(): void {
-    if (this.isSubmitDisabled) return;
+    this.submitted = true;
 
-    if (
-      !this.formData.description.trim() ||
-      !this.formData.hearingDate ||
-      !this.formData.location.trim()
-    ) {
-      return;
-    }
-    this.save.emit(this.formData);
+    if (this.isSubmitDisabled) return;
+    if (this.hearingForm.invalid) return;
+
+    this.save.emit(this.hearingForm.value as HearingFormData);
   }
 
   onClose(): void {
@@ -96,16 +113,22 @@ export class HearingFormModalComponent implements OnChanges {
     event.stopPropagation();
   }
 
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
   private resetForm(): void {
-    const blank: HearingFormData = {
+    this.hearingForm.reset({
       description: '',
       hearingDate: '',
       location: '',
-    };
-    this.formData = { ...blank };
-    this.originalData = { ...blank };
+    });
+    this.originalData = { description: '', hearingDate: '', location: '' };
+    this.submitted = false;
   }
 
+  // Converts an ISO date string from the API (e.g. "2024-03-15T14:30:00Z")
+  // into the format that <input type="datetime-local"> expects: "2024-03-15T14:30"
   private formatDateForInput(dateString: string): string {
     const date = new Date(dateString);
     const year = date.getFullYear();

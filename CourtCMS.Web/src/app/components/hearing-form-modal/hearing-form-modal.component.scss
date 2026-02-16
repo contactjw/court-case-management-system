@@ -89,6 +89,25 @@ $danger-red: #dc3545;
     &::placeholder {
       color: #adb5bd;
     }
+
+    // Validation error state
+    &.invalid {
+      border-color: $danger-red;
+
+      &.focus {
+        border-color: $danger-red;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+      }
+    }
+  }
+
+  .error-message {
+    display: block;
+    color: $danger-red;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+    animation: fadeIn 0.15s ease-out;
   }
 }
 
