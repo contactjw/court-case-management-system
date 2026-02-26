@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Hearing } from '../models/case.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class HearingService {
   // Base URL for hearings API - hearings must belong to a case
   // This produces URLs like: /api/cases/3/hearings
   private getBaseUrl(caseId: number): string {
-    return `/api/cases/${caseId}/hearings`;
+    return `${environment.apiBaseUrl}/api/cases/${caseId}/hearings`;
   }
 
   constructor(private http: HttpClient) {}
