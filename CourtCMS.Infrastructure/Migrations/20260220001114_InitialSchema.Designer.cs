@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourtCMS.Infrastructure.Migrations
 {
     [DbContext(typeof(CourtDbContext))]
-    [Migration("20260204053107_InitialSchema")]
+    [Migration("20260220001114_InitialSchema")]
     partial class InitialSchema
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace CourtCMS.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

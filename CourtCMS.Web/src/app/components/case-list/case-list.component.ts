@@ -33,6 +33,7 @@ export class CaseListComponent implements OnInit {
   }
 
   // --- MODAL STATE ---
+  isLoading = true;
   isModalOpen = false;
   selectedCase: Case | null = null;
   isSaving = false;
@@ -48,13 +49,17 @@ export class CaseListComponent implements OnInit {
   }
 
   loadData(): void {
+    this.isLoading = true;
     this.caseService.getCases().subscribe({
       next: (data) => {
         this.cases = data;
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching cases:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
     });
 

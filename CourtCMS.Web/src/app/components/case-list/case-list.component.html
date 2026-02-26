@@ -15,18 +15,30 @@
   <!-- STATS BAR -->
   <!-- This section demonstrates data-driven UI thinking. -->
   <div class="stats-bar">
-    <div class="stat-card">
-      <span class="stat-number">{{ totalCases }}</span>
-      <span class="stat-label">Total Cases</span>
-    </div>
-    <div class="stat-card stat-open">
-      <span class="stat-number">{{ openCases }}</span>
-      <span class="stat-label">Open</span>
-    </div>
-    <div class="stat-card stat-closed">
-      <span class="stat-number">{{ closedCases }}</span>
-      <span class="stat-label">Closed</span>
-    </div>
+    @if (isLoading) {
+      <div class="stat-card">
+        <span class="stat-number">—</span><span class="stat-label">Total Cases</span>
+      </div>
+      <div class="stat-card stat-open">
+        <span class="stat-number">—</span><span class="stat-label">Open</span>
+      </div>
+      <div class="stat-card stat-closed">
+        <span class="stat-number">—</span><span class="stat-label">Closed</span>
+      </div>
+    } @else {
+      <div class="stat-card">
+        <span class="stat-number">{{ totalCases }}</span
+        ><span class="stat-label">Total Cases</span>
+      </div>
+      <div class="stat-card stat-open">
+        <span class="stat-number">{{ openCases }}</span
+        ><span class="stat-label">Open</span>
+      </div>
+      <div class="stat-card stat-closed">
+        <span class="stat-number">{{ closedCases }}</span
+        ><span class="stat-label">Closed</span>
+      </div>
+    }
   </div>
 
   <!-- CASE CARDS GRID -->
@@ -71,13 +83,20 @@
         </div>
       </div>
     } @empty {
-      <div class="empty-state">
-        <p class="empty-icon">📋</p>
-        <p class="empty-title">No cases found</p>
-        <p class="empty-subtitle">
-          File a new case to get started, or check that the backend is running.
-        </p>
-      </div>
+      @if (isLoading) {
+        <div class="empty-state">
+          <!-- <p class="empty-icon">⏳</p> -->
+          <p class="empty-title">Loading cases...</p>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p class="empty-icon">📋</p>
+          <p class="empty-title">No cases found</p>
+          <p class="empty-subtitle">
+            File a new case to get started, or check that the backend is running.
+          </p>
+        </div>
+      }
     }
   </div>
 </main>

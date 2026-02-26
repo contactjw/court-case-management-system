@@ -6,7 +6,6 @@ namespace CourtCMS.Infrastructure.Data
     {
         public static void Initialize(CourtDbContext context)
         {
-            context.Database.EnsureCreated();
 
             // Check if there are any Judges already in the database
             if (context.Judges.Any())
