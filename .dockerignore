@@ -1,0 +1,56 @@
+
+Copy
+
+# ============================================================
+# .DOCKERIGNORE
+# ============================================================
+# Works exactly like .gitignore but for Docker.
+# When Docker builds an image, it sends the entire project
+# directory to the Docker daemon as "build context."
+# This file tells Docker to SKIP files that aren't needed,
+# making builds faster and images smaller.
+# ============================================================
+
+# .NET build artifacts (we rebuild inside the container)
+**/bin/
+**/obj/
+**/out/
+# Catch directories with literal backslashes (created by some Windows tools on macOS)
+**/bin\*
+**/obj\*
+# Stale publish output
+**/publish/
+**/deploy.zip
+
+# Node modules (we run npm ci inside the container)
+**/node_modules/
+
+# Angular build output (we rebuild inside the container)
+**/dist/
+**/.angular/
+
+# IDE and OS files
+**/.vs/
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/Thumbs.db
+
+# Git
+**/.git/
+**/.gitignore
+
+# Docker files (no need to copy Docker into Docker)
+**/Dockerfile
+**/Dockerfile.*
+**/docker-compose.yml
+**/.dockerignore
+
+# Secrets and local config (NEVER put secrets in a Docker image)
+**/secrets.json
+**/*.user
+
+# Documentation and misc
+**/*.md
+**/LICENSE
+**/repomix-output.xml

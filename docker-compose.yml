@@ -1,0 +1,102 @@
+# ============================================================
+# DOCKER COMPOSE — LOCAL DEVELOPMENT
+# ============================================================
+# This file defines all three services that make up CourtCMS
+# and wires them together with a single command:
+#
+#   docker compose up --build
+#
+# Think of it as a recipe that says:
+#   "I need a database, an API, and a web server.
+#    Here's how to configure each one, and here's
+#    how they talk to each other."
+#
+# After running, the app is available at:
+#   Frontend:  http://localhost:4200
+#   API:       http://localhost:5196
+#   API Docs:  http://localhost:5196/swagger
+# ============================================================
+
+services:
+  # --------------------------------------------------------
+  # DATABASE: SQL Server 2022
+  # --------------------------------------------------------
+  # This replaces your local SQL Server installation.
+  # Every developer on the team gets the exact same database
+  # setup without installing anything on their machine.
+  # --------------------------------------------------------
+  db:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: courtcms-db
+    environment:
+      - ACCEPT_EULA=Y # Required by SQL Server
+      - MSSQL_SA_PASSWORD=DevP@ssw0rd123! # Local dev only — never use in production
+    ports:
+      - '1433:1433' # Expose SQL Server on the standard port
+    volumes:
+      - sqldata:/var/opt/mssql # Persist data between container restarts
+    healthcheck:
+      # Check if SQL Server has written "ready for client connections" to its log.
+      # This avoids depending on sqlcmd, which may not exist in Azure SQL Edge.
+      test:
+        [
+          'CMD-SHELL',
+          "grep -q 'ready for client connections' /var/opt/mssql/log/errorlog || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # --------------------------------------------------------
+  # BACKEND: .NET API
+  # --------------------------------------------------------
+  # Builds from the Dockerfile in CourtCMS.Api/
+  # Connects to the SQL Server container above using Docker's
+  # internal DNS — the hostname "db" resolves to the database
+  # container's IP address automatically.
+  # --------------------------------------------------------
+  api:
+    build:
+      context: . # Build context is the project root
+      dockerfile: CourtCMS.Api/Dockerfile
+    container_name: courtcms-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # Connection string using Docker's internal DNS.
+      # "db" is the service name above — Docker resolves it
+      # to the database container's IP address.
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=CourtCMSDb;User Id=sa;Password=DevP@ssw0rd123!;TrustServerCertificate=True;
+    ports:
+      - '5196:8080' # Map host port 5196 to container port 8080
+    depends_on:
+      db:
+        condition: service_healthy # Wait for DB to be ready
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # FRONTEND: Angular served by Nginx
+  # --------------------------------------------------------
+  # Builds the Angular app and serves it through Nginx.
+  # Nginx also proxies /api requests to the API container.
+  # --------------------------------------------------------
+  web:
+    build:
+      context: . # Build context is the project root
+      dockerfile: CourtCMS.Web/Dockerfile
+    container_name: courtcms-web
+    ports:
+      - '4200:80' # Map host port 4200 to Nginx port 80
+    depends_on:
+      - api # Start after the API is running
+    restart: unless-stopped
+
+# --------------------------------------------------------
+# VOLUMES
+# --------------------------------------------------------
+# Named volumes persist data between container restarts.
+# Without this, your database would be wiped every time
+# you run 'docker compose down'.
+# --------------------------------------------------------
+volumes:
+  sqldata:

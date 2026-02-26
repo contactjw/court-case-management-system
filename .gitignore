@@ -498,3 +498,8 @@ $RECYCLE.BIN/
 
 repomix-output.xml
 .repomixignore
+
+# Deployment artifacts
+deploy.zip
+publish/
+Dockerfile.diagnostic
